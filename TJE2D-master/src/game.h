@@ -9,6 +9,7 @@
 #include "image.h"
 #include "utils.h"
 #include "synth.h"
+#include "mygame.h"
 
 class Game
 {
