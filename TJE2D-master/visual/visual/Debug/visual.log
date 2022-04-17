@@ -1,35 +1,14 @@
 ﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(377,5): warning MSB8004: El directorio Output no termina con una barra diagonal final. Esta instancia de compilación agregará la barra diagonal porque es necesaria para que se pueda evaluar correctamente el directorio Output.
-  framework.cpp
-c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\framework.h(257): warning C4244: 'argumento': conversión de 'int' a 'float'; posible pérdida de datos
-c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\framework.h(259): warning C4244: 'argumento': conversión de 'float' a 'unsigned char'; posible pérdida de datos
-c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\framework.h(275): warning C4244: 'inicializando': conversión de 'double' a 'float'; posible pérdida de datos
-c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\framework.h(278): warning C4244: 'argumento': conversión de 'double' a 'unsigned char'; posible pérdida de datos
   game.cpp
 c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\image.h(61): warning C4018: '>=': no coinciden signed/unsigned
 c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\image.h(104): warning C4018: '<': no coinciden signed/unsigned
 c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\image.h(105): warning C4018: '<': no coinciden signed/unsigned
-  image.cpp
-c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\framework.h(257): warning C4244: 'argumento': conversión de 'int' a 'float'; posible pérdida de datos
-c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\framework.h(259): warning C4244: 'argumento': conversión de 'float' a 'unsigned char'; posible pérdida de datos
-c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\framework.h(275): warning C4244: 'inicializando': conversión de 'double' a 'float'; posible pérdida de datos
-c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\framework.h(278): warning C4244: 'argumento': conversión de 'double' a 'unsigned char'; posible pérdida de datos
-c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\image.h(53): warning C4244: 'argumento': conversión de 'unsigned int' a 'float'; posible pérdida de datos
-c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\image.h(53): warning C4244: '=': conversión de 'float' a 'unsigned int'; posible pérdida de datos
-c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\image.h(54): warning C4244: 'argumento': conversión de 'unsigned int' a 'float'; posible pérdida de datos
-c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\image.h(54): warning C4244: '=': conversión de 'float' a 'unsigned int'; posible pérdida de datos
-c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\image.h(61): warning C4018: '>=': no coinciden signed/unsigned
-c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\image.h(74): warning C4244: 'argumento': conversión de 'float' a 'int'; posible pérdida de datos
-c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\image.h(104): warning C4018: '<': no coinciden signed/unsigned
-c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\image.h(105): warning C4018: '<': no coinciden signed/unsigned
-c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\image.cpp(167): warning C4018: '>=': no coinciden signed/unsigned
-c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\image.cpp(171): warning C4018: '>=': no coinciden signed/unsigned
-c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\image.cpp(204): warning C4018: '<': no coinciden signed/unsigned
-  input.cpp
+c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\game.cpp(122): warning C4018: '>': no coinciden signed/unsigned
+c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\game.cpp(123): warning C4018: '>': no coinciden signed/unsigned
   main.cpp
 c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\image.h(61): warning C4018: '>=': no coinciden signed/unsigned
 c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\image.h(104): warning C4018: '<': no coinciden signed/unsigned
 c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\image.h(105): warning C4018: '<': no coinciden signed/unsigned
-  synth.cpp
   utils.cpp
 c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\image.h(61): warning C4018: '>=': no coinciden signed/unsigned
 c:\users\home_\documents\github\je-2022-2d\tje2d-master\src\image.h(104): warning C4018: '<': no coinciden signed/unsigned

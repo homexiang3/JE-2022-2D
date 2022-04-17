@@ -2,7 +2,8 @@
 #include "utils.h"
 #include "input.h"
 #include "image.h"
-#include "mygame.h"
+#include "player.h"
+#include "map.h"
 
 #include <cmath>
 
@@ -72,7 +73,8 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 
 	font.loadTGA("data/bitmap-font-white.tga"); //load bitmap-font image
 	minifont.loadTGA("data/mini-font-white-4x6.tga"); //load bitmap-font image
-	sprite.loadTGA("data/spritesheet.tga"); //example to load an sprite
+	sprite.loadTGA("data/astronaut.tga"); //example to load an sprite
+
 
 	//read file example
 		//std::string s;
