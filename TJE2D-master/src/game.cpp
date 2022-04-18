@@ -2,8 +2,8 @@
 #include "utils.h"
 #include "input.h"
 #include "image.h"
-#include "player.h"
-#include "map.h"
+#include "world.h"
+#include "stage.h"
 
 #include <cmath>
 
@@ -13,13 +13,10 @@ Image font;
 Image minifont;
 Image sprite;
 Color bgcolor(130, 80, 100);
-//added player from mygame.h
+//added player from world.h
 sPlayer player;
+sCamera camera;
 //constants of the game
-const float moveSpeed = 50.0f;
-const float animSpeed = 4.0f;
-const int spriteWidth = 14;
-const int spriteHeigth = 18;
 const float noteSpeed = 2.0f;
 //oscilator example
 int notes[] = { 45,75,60,72,82 };
@@ -29,34 +26,22 @@ int notesLength() {
 //map functions
 Image tileset;
 GameMap* map;
+//stages
+std::vector<Stage*> stages;
+STAGE_ID currentStage = STAGE_ID::INTRO;
 
-//example of parser of .map from rogued editor
-GameMap* loadGameMap(const char* filename)
-{
-	FILE* file = fopen(filename, "rb");
-	if (file == NULL) //file not found
-		return NULL;
+Stage* GetStage(STAGE_ID id) { return stages[(int)id]; };
+Stage* GetCurrentStage() { return GetStage(currentStage); };
+void SetStage(STAGE_ID id) { currentStage = id; };
 
-	sMapHeader header; //read header and store it in the struct
-	fread(&header, sizeof(sMapHeader), 1, file);
-	assert(header.bytes == 1); //always control bad cases!!
+void InitStages() {
+	stages.reserve(4);
+	stages.push_back(new IntroStage());
+	stages.push_back(new TutorialStage());
+	stages.push_back(new PlayStage());
+	stages.push_back(new EndStage());
+}
 
-
-	//allocate memory for the cells data and read it
-	unsigned char* cells = new unsigned char[header.w*header.h];
-	fread(cells, header.bytes, header.w*header.h, file);
-	fclose(file); //always close open files
-	//create the map where we will store it
-	GameMap* map = new GameMap(header.w, header.h);
-
-	for (int x = 0; x < map->width; x++)
-		for (int y = 0; y < map->height; y++)
-			map->getCell(x, y).type = (eCellType)cells[x + y * map->width];
-
-	delete[] cells; //always free any memory allocated!
-
-	return map;
-};
 
 Game::Game(int window_width, int window_height, SDL_Window* window)
 {
@@ -70,6 +55,10 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	frame = 0;
 	time = 0.0f;
 	elapsed_time = 0.0f;
+
+	//stages
+	InitStages();
+	//endstages
 
 	font.loadTGA("data/bitmap-font-white.tga"); //load bitmap-font image
 	minifont.loadTGA("data/mini-font-white-4x6.tga"); //load bitmap-font image
@@ -89,46 +78,8 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	//synth.playSample("data/coin.wav",1,true);
 	//synth.osc1.amplitude = 0.5;
 	synth.osc1.amplitude = 0.5;
+
 }
-
-void renderPlayer(sPlayer& player, Image* framebuffer, float time) {
-
-	int start_x = (int(time * animSpeed) % 4) * spriteWidth;
-	start_x = player.isMoving ? start_x : 0;
-	int start_y = (int)player.dir * spriteHeigth;
-	framebuffer->drawImage(sprite, player.position.x, player.position.y, Area(start_x, start_y, spriteWidth, spriteHeigth));
-};
-
-void renderGameMap(Image& framebuffer) {
-	//size in pixels of a cell, we assume every row has 16 cells so the cell size must be image.width / 16
-	int cs = tileset.width / 16;
-
-	//for every cell
-	for (int x = 0; x < map->width; ++x)
-		for (int y = 0; y < map->height; ++y)
-		{
-			//get cell info
-			sCell& cell = map->getCell(x, y);
-			if (cell.type == 0) //skip empty
-				continue;
-			int type = (int)cell.type;
-			//compute tile pos in tileset image
-			int tilex = (type % 16) * cs; 	//x pos in tileset
-			int tiley = floor(type / 16) * cs;	//y pos in tileset
-			Area area(tilex, tiley, cs, cs); //tile area
-			int screenx = x * cs; //place offset here if you want
-			int screeny = y * cs;
-			//avoid rendering out of screen stuff
-			if (screenx < -cs || screenx > framebuffer.width ||
-				screeny < -cs || screeny > framebuffer.height)
-				continue;
-
-			//draw region of tileset inside framebuffer
-			framebuffer.drawImage(tileset, 		//image
-				screenx, screeny, 	//pos in screen
-				area); 		//area
-		}
-};
 
 //what to do when the image has to be draw
 void Game::render(void)
@@ -137,8 +88,9 @@ void Game::render(void)
 	Image framebuffer(160, 120); //do not change framebuffer size
 
 	//add your code here to fill the framebuffer
-	renderGameMap(framebuffer);
-	renderPlayer(player, &framebuffer, time);
+		renderGameMap(framebuffer, tileset, map);
+		renderPlayer(player, &framebuffer, time, sprite);
+		//GetCurrentStage()->Render(framebuffer);
 
 	//some new useful functions
 		//framebuffer.fill( bgcolor );								//fills the image with one color
@@ -155,28 +107,36 @@ void Game::render(void)
 
 void Game::update(double seconds_elapsed)
 {
-	//Add here your update method
-	//...
+	//Update with stages
+	//GetCurrentStage()->Update(seconds_elapsed);
+
+	//Debug stages (change stages with space)
+	if (Input::wasKeyPressed(SDL_SCANCODE_SPACE))
+	{
+		int nextStageIndex = (((int)currentStage) + 1) % stages.size();
+		SetStage((STAGE_ID)nextStageIndex);
+	}
+	
 	Vector2 movement;
 	//Read the keyboard state, to see all the keycodes: https://wiki.libsdl.org/SDL_Keycode
 	if (Input::isKeyPressed(SDL_SCANCODE_W)) //up
 	{
-		movement.y -= moveSpeed;
+		movement.y -= player.moveSpeed;
 		player.dir = PLAYER_DIR::UP;
 	}
 	if (Input::isKeyPressed(SDL_SCANCODE_S)) //down
 	{
-		movement.y += moveSpeed;
+		movement.y += player.moveSpeed;
 		player.dir = PLAYER_DIR::DOWN;
 	}
 	if (Input::isKeyPressed(SDL_SCANCODE_D)) //right
 	{
-		movement.x += moveSpeed;
+		movement.x += player.moveSpeed;
 		player.dir = PLAYER_DIR::RIGHT;
 	}
 	if (Input::isKeyPressed(SDL_SCANCODE_A)) //left
 	{
-		movement.x -= moveSpeed;
+		movement.x -= player.moveSpeed;
 		player.dir = PLAYER_DIR::LEFT;
 	}
 	//update movement
