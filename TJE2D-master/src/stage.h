@@ -50,4 +50,10 @@ public:
 
 };
 
+Stage* GetStage(STAGE_ID id, std::vector<Stage*>& stages);
+Stage* GetCurrentStage(STAGE_ID currentStage, std::vector<Stage*>& stages);
+void SetStage(STAGE_ID id, STAGE_ID &currentStage);
+
+void InitStages(std::vector<Stage*>& stages);
+
 #endif

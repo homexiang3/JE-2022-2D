@@ -26,18 +26,6 @@ GameMap* map;
 std::vector<Stage*> stages;
 STAGE_ID currentStage = STAGE_ID::INTRO;
 
-Stage* GetStage(STAGE_ID id) { return stages[(int)id]; };
-Stage* GetCurrentStage() { return GetStage(currentStage); };
-void SetStage(STAGE_ID id) { currentStage = id; };
-
-void InitStages() {
-	stages.reserve(4);
-	stages.push_back(new IntroStage());
-	stages.push_back(new TutorialStage());
-	stages.push_back(new PlayStage());
-	stages.push_back(new EndStage());
-}
-
 
 Game::Game(int window_width, int window_height, SDL_Window* window)
 {
@@ -53,7 +41,7 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	elapsed_time = 0.0f;
 
 	//stages
-	InitStages();
+	InitStages(stages);
 	//endstages
 
 	font.loadTGA("data/bitmap-font-white.tga"); //load bitmap-font image
@@ -84,9 +72,9 @@ void Game::render(void)
 	Image framebuffer(160, 120); //do not change framebuffer size
 
 	//add your code here to fill the framebuffer
-		renderGameMap(framebuffer, tileset, map);
-		renderPlayer(player, &framebuffer, time, sprite);
-		//GetCurrentStage()->Render(framebuffer);
+		//renderGameMap(framebuffer, tileset, map);
+		//renderPlayer(player, &framebuffer, time, sprite);
+		GetCurrentStage(currentStage,stages)->Render(framebuffer);
 
 	//some new useful functions
 		//framebuffer.fill( bgcolor );								//fills the image with one color
@@ -104,13 +92,14 @@ void Game::render(void)
 void Game::update(double seconds_elapsed)
 {
 	//Update with stages
-	//GetCurrentStage()->Update(seconds_elapsed);
+	//GetCurrentStage(currentStage,stages)->Update(seconds_elapsed);
 
 	//Debug stages (change stages with space)
 	if (Input::wasKeyPressed(SDL_SCANCODE_SPACE))
 	{
 		int nextStageIndex = (((int)currentStage) + 1) % stages.size();
-		SetStage((STAGE_ID)nextStageIndex);
+		SetStage((STAGE_ID)nextStageIndex, currentStage);
+
 	}
 	
 	Vector2 movement;
@@ -144,7 +133,7 @@ void Game::update(double seconds_elapsed)
 	//example of 'was pressed'
 	if (Input::wasKeyPressed(SDL_SCANCODE_F)) //if key F was pressed example sound
 	{
-		synth.playSample("data/coin.wav", 1, false);
+		synth.playSample("data/hit.wav", 1, false);
 	}
 	if (Input::wasKeyPressed(SDL_SCANCODE_Z)) //if key Z was pressed
 	{
