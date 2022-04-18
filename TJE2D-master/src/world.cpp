@@ -70,3 +70,13 @@ void renderPlayer(sPlayer& player, Image* framebuffer, float time, Image sprite)
 	int start_y = (int)player.dir * player.spriteHeight;
 	framebuffer->drawImage(sprite, player.position.x, player.position.y, Area(start_x, start_y, player.spriteWidth, player.spriteHeight));
 };
+
+int synthMusic::notesLength() {
+	return sizeof(this->notes) / sizeof(this->notes[0]);
+}
+
+void synthMusic::playMelody() {
+	int length = this->notesLength();
+	int noteIndex = int(Game::instance->time*this->noteSpeed) % length;
+	Game::instance->synth.osc1.setNote(this->notes[noteIndex]);
+}

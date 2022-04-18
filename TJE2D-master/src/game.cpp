@@ -12,17 +12,13 @@ Game* Game::instance = NULL;
 Image font;
 Image minifont;
 Image sprite;
+Image intro;
 Color bgcolor(130, 80, 100);
 //added player from world.h
 sPlayer player;
 sCamera camera;
 //constants of the game
-const float noteSpeed = 2.0f;
-//oscilator example
-int notes[] = { 45,75,60,72,82 };
-int notesLength() {
-	return sizeof(notes) / sizeof(notes[0]);
-};
+synthMusic music;
 //map functions
 Image tileset;
 GameMap* map;
@@ -63,7 +59,7 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	font.loadTGA("data/bitmap-font-white.tga"); //load bitmap-font image
 	minifont.loadTGA("data/mini-font-white-4x6.tga"); //load bitmap-font image
 	sprite.loadTGA("data/astronaut.tga"); //example to load an sprite
-
+	intro.loadTGA("data/intro.tga");
 
 	//read file example
 		//std::string s;
@@ -143,9 +139,7 @@ void Game::update(double seconds_elapsed)
 	player.position += movement * seconds_elapsed;
 	player.isMoving = movement.x != 0.0f || movement.y != 0.0f;
 	//oscilator example
-	int length = notesLength();
-	int noteIndex = int(time*noteSpeed) % length;
-	synth.osc1.setNote(notes[noteIndex]);
+	music.playMelody();
 
 	//example of 'was pressed'
 	if (Input::wasKeyPressed(SDL_SCANCODE_F)) //if key F was pressed example sound

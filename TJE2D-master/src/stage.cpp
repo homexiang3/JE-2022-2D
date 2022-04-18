@@ -3,7 +3,7 @@
 
 
 void IntroStage::Render(Image& framebuffer) {
-	framebuffer.fill(Color::BLUE);
+	framebuffer.fill(Color::RED);
 }
 
 void IntroStage::Update(float seconds_elapsed) {

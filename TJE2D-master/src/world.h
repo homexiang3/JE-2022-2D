@@ -83,4 +83,14 @@ struct sCamera {
 	Vector2 position;
 };
 
+//Music class
+
+class synthMusic {
+public:
+	int notes[5] = { 45,75,60,72,82 };
+	float noteSpeed = 2.0f;
+	int notesLength();
+	void playMelody();
+};
+
 #endif
