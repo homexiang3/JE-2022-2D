@@ -1,6 +1,7 @@
 #ifndef WORLD_H
 #define WORLD_H
 
+#include "stage.h"
 //MAP FUNCTIONS
 
 enum eCellType : uint8 {
@@ -117,6 +118,9 @@ public:
 	Image tileset;
 	GameMap* map;
 	std::vector<GameMap*> maps; //cargas fichero level_db.txt y metes todos los niveles en maps
+	//stages
+	std::vector<Stage*> stages;
+	STAGE_ID currentStage = STAGE_ID::PLAY;
 
 	void loadWorld();
 };

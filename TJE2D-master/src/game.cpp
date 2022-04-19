@@ -9,9 +9,6 @@
 
 Game* Game::instance = NULL;
 
-//stages
-std::vector<Stage*> stages;
-STAGE_ID currentStage = STAGE_ID::PLAY;
 
 Game::Game(int window_width, int window_height, SDL_Window* window)
 {
@@ -26,14 +23,14 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	time = 0.0f;
 	elapsed_time = 0.0f;
 
-	//stages
-	InitStages(stages);
 	//load world
 	world.loadWorld();
+	//stages
+	InitStages(world.stages);
+	
 
 	enableAudio(); //enable this line if you plan to add audio to your application
 	//synth.playSample("data/coin.wav",1,true);
-	//synth.osc1.amplitude = 0.5;
 	synth.osc1.amplitude = 0.5;
 
 }
@@ -45,7 +42,7 @@ void Game::render(void)
 	Image framebuffer(160, 120); //do not change framebuffer size
 
 	//add your code here to fill the framebuffer
-		GetCurrentStage(currentStage,stages)->Render(framebuffer);
+		GetCurrentStage(world.currentStage,world.stages)->Render(framebuffer);
 
 	//some new useful functions
 		//framebuffer.fill( bgcolor );								//fills the image with one color
@@ -61,15 +58,16 @@ void Game::render(void)
 }
 
 void Game::update(double seconds_elapsed)
-{
+{	
+
 	//Update with stages
-	GetCurrentStage(currentStage,stages)->Update(seconds_elapsed);
+	GetCurrentStage(world.currentStage,world.stages)->Update(seconds_elapsed);
 
 	//Debug stages (change stages with space)
 	if (Input::wasKeyPressed(SDL_SCANCODE_SPACE))
 	{
-		int nextStageIndex = (((int)currentStage) + 1) % stages.size();
-		SetStage((STAGE_ID)nextStageIndex, currentStage);
+		int nextStageIndex = (((int)world.currentStage) + 1) % world.stages.size();
+		SetStage((STAGE_ID)nextStageIndex, world.currentStage);
 
 	}
 	

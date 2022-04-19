@@ -8,6 +8,8 @@ Stage* GetStage(STAGE_ID id, std::vector<Stage*>& stages) { return stages[(int)i
 Stage* GetCurrentStage(STAGE_ID currentStage, std::vector<Stage*>& stages) { return GetStage(currentStage, stages); };
 void SetStage(STAGE_ID id, STAGE_ID &currentStage) { currentStage = id; };
 
+
+
 void InitStages(std::vector<Stage*>& stages) {
 	stages.reserve(4);
 	stages.push_back(new IntroStage());
@@ -17,20 +19,39 @@ void InitStages(std::vector<Stage*>& stages) {
 }
 
 void IntroStage::Render(Image& framebuffer) {
-	framebuffer.fill(Color::RED);
+	framebuffer.drawImage(Game::instance->world.intro, 0, 0);
+	framebuffer.drawText("SUSHI SAVIOR", 40, 10, Game::instance->world.font);
+	if (int(Game::instance->time) % 2 == 0) {
+		framebuffer.drawText("Press F to continue", 35, 100, Game::instance->world.minifont, 4, 6);
+	}
 }
 
+
 void IntroStage::Update(float seconds_elapsed) {
-	
+	if (Input::wasKeyPressed(SDL_SCANCODE_F))
+	{
+		Game::instance->world.currentStage = TUTORIAL;
+	}
 }
 
 
 void TutorialStage::Render(Image& framebuffer) {
+
+	Image minifont = Game::instance->world.minifont;
 	framebuffer.fill(Color::BLUE);
+	framebuffer.drawText("While you were travelling on the", 12, 10, minifont, 4, 6);
+	framebuffer.drawText("sushi galaxy you received a help", 12, 25, minifont, 4, 6);
+	framebuffer.drawText("message from the maki planet.", 15, 40, minifont, 4, 6);
+	framebuffer.drawText("The autoproclamated soy sauce king", 10, 60, minifont, 4, 6);
+	framebuffer.drawText("challenge you on a puzzle game.", 15, 75, minifont, 4, 6);
+	framebuffer.drawText("conquer the trials and make him quit.", 8, 90, minifont, 4, 6);
 }
 
 void TutorialStage::Update(float seconds_elapsed) {
-
+	if (Input::wasKeyPressed(SDL_SCANCODE_F))
+	{
+		Game::instance->world.currentStage = PLAY;
+	}
 }
 
 void PlayStage::Render(Image& framebuffer) {
@@ -106,9 +127,13 @@ void PlayStage::Update(float seconds_elapsed) {
 }
 
 void EndStage::Render(Image& framebuffer) {
+	Game::instance->synth.osc1.amplitude = 0;
 	framebuffer.fill(Color::PURPLE);
 }
 
 void EndStage::Update(float seconds_elapsed) {
-
+	if (Input::wasKeyPressed(SDL_SCANCODE_F))
+	{
+		Game::instance->must_exit = true;
+	}
 }
