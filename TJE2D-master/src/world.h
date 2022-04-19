@@ -68,8 +68,8 @@ enum PLAYER_DIR {
 
 struct sPlayer {
 	Vector2 position;
-	bool isMoving;
-	PLAYER_DIR dir;
+	bool isMoving = false;
+	PLAYER_DIR dir = DOWN;
 	//prev constants of game
 	float moveSpeed = 50.0f;
 	float animSpeed = 4.0f;
@@ -92,5 +92,28 @@ public:
 	int notesLength();
 	void playMelody();
 };
+
+//WORLD
+
+//CLASS WORLD
+class World {
+public:
+	Image font;
+	Image minifont;
+	Image sprite;
+	Image intro;
+	//Color bgcolor(130, 80, 100);
+	//added player from world.h
+	sPlayer player;
+	sCamera camera;
+	//constants of the game
+	synthMusic music;
+	//map functions
+	Image tileset;
+	GameMap* map;
+
+	void loadWorld();
+};
+
 
 #endif

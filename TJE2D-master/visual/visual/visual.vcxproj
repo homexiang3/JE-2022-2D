@@ -16,8 +16,10 @@
     <ClCompile Include="..\..\src\image.cpp" />
     <ClCompile Include="..\..\src\input.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
+    <ClCompile Include="..\..\src\stage.cpp" />
     <ClCompile Include="..\..\src\synth.cpp" />
     <ClCompile Include="..\..\src\utils.cpp" />
+    <ClCompile Include="..\..\src\world.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\framework.h" />
@@ -25,22 +27,24 @@
     <ClInclude Include="..\..\src\image.h" />
     <ClInclude Include="..\..\src\includes.h" />
     <ClInclude Include="..\..\src\input.h" />
+    <ClInclude Include="..\..\src\stage.h" />
     <ClInclude Include="..\..\src\synth.h" />
     <ClInclude Include="..\..\src\utils.h" />
+    <ClInclude Include="..\..\src\world.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9DC7275D-D453-4D7A-AF99-62C8D8DB059B}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>visual</RootNamespace>
     <ProjectName>Game</ProjectName>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>

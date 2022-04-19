@@ -8,10 +8,10 @@
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\synth.cpp" />
     <ClCompile Include="..\..\src\utils.cpp" />
-    <ClCompile Include="..\..\src\world.cpp">
+    <ClCompile Include="..\..\src\stage.cpp">
       <Filter>myGame</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\stage.cpp">
+    <ClCompile Include="..\..\src\world.cpp">
       <Filter>myGame</Filter>
     </ClCompile>
   </ItemGroup>
@@ -23,16 +23,16 @@
     <ClInclude Include="..\..\src\input.h" />
     <ClInclude Include="..\..\src\synth.h" />
     <ClInclude Include="..\..\src\utils.h" />
-    <ClInclude Include="..\..\src\world.h">
+    <ClInclude Include="..\..\src\stage.h">
       <Filter>myGame</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\stage.h">
+    <ClInclude Include="..\..\src\world.h">
       <Filter>myGame</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="myGame">
-      <UniqueIdentifier>{d5df6a8d-b051-486a-a176-cd364fefab9a}</UniqueIdentifier>
+      <UniqueIdentifier>{e767dcba-669e-4b1e-9e82-72195d632287}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

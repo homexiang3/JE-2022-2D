@@ -1,6 +1,5 @@
 #include "game.h"
 #include "utils.h"
-#include "input.h"
 #include "image.h"
 #include "world.h"
 
@@ -69,6 +68,7 @@ void renderPlayer(sPlayer& player, Image* framebuffer, float time, Image sprite)
 	start_x = player.isMoving ? start_x : 0;
 	int start_y = (int)player.dir * player.spriteHeight;
 	framebuffer->drawImage(sprite, player.position.x, player.position.y, Area(start_x, start_y, player.spriteWidth, player.spriteHeight));
+
 };
 
 int synthMusic::notesLength() {
@@ -79,4 +79,21 @@ void synthMusic::playMelody() {
 	int length = this->notesLength();
 	int noteIndex = int(Game::instance->time*this->noteSpeed) % length;
 	Game::instance->synth.osc1.setNote(this->notes[noteIndex]);
+}
+
+void World::loadWorld() {
+
+	font.loadTGA("data/bitmap-font-white.tga"); //load bitmap-font image
+	minifont.loadTGA("data/mini-font-white-4x6.tga"); //load bitmap-font image
+	sprite.loadTGA("data/astronaut.tga"); //example to load an sprite
+	intro.loadTGA("data/intro.tga");
+
+	//read file example
+		//std::string s;
+		//readFile("data/test.txt", s);
+		//std::cout << s << std::endl;
+
+	//load map/tileset example
+	tileset.loadTGA("data/tileset.tga");
+	map = loadGameMap("data/mymap.map");
 }

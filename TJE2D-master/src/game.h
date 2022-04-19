@@ -27,7 +27,8 @@ public:
 	float elapsed_time;
 	int fps;
 	bool must_exit;
-
+	//world var
+	World world;
 	//audio
 	Synth synth;
 

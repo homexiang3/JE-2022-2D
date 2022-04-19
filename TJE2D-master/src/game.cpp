@@ -9,23 +9,9 @@
 
 Game* Game::instance = NULL;
 
-Image font;
-Image minifont;
-Image sprite;
-Image intro;
-Color bgcolor(130, 80, 100);
-//added player from world.h
-sPlayer player;
-sCamera camera;
-//constants of the game
-synthMusic music;
-//map functions
-Image tileset;
-GameMap* map;
 //stages
 std::vector<Stage*> stages;
-STAGE_ID currentStage = STAGE_ID::INTRO;
-
+STAGE_ID currentStage = STAGE_ID::PLAY;
 
 Game::Game(int window_width, int window_height, SDL_Window* window)
 {
@@ -42,21 +28,8 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 
 	//stages
 	InitStages(stages);
-	//endstages
-
-	font.loadTGA("data/bitmap-font-white.tga"); //load bitmap-font image
-	minifont.loadTGA("data/mini-font-white-4x6.tga"); //load bitmap-font image
-	sprite.loadTGA("data/astronaut.tga"); //example to load an sprite
-	intro.loadTGA("data/intro.tga");
-
-	//read file example
-		//std::string s;
-		//readFile("data/test.txt", s);
-		//std::cout << s << std::endl;
-
-	//load map/tileset example
-		tileset.loadTGA("data/tileset.tga");
-		map = loadGameMap("data/mymap.map");
+	//load world
+	world.loadWorld();
 
 	enableAudio(); //enable this line if you plan to add audio to your application
 	//synth.playSample("data/coin.wav",1,true);
@@ -72,8 +45,6 @@ void Game::render(void)
 	Image framebuffer(160, 120); //do not change framebuffer size
 
 	//add your code here to fill the framebuffer
-		//renderGameMap(framebuffer, tileset, map);
-		//renderPlayer(player, &framebuffer, time, sprite);
 		GetCurrentStage(currentStage,stages)->Render(framebuffer);
 
 	//some new useful functions
@@ -92,7 +63,7 @@ void Game::render(void)
 void Game::update(double seconds_elapsed)
 {
 	//Update with stages
-	//GetCurrentStage(currentStage,stages)->Update(seconds_elapsed);
+	GetCurrentStage(currentStage,stages)->Update(seconds_elapsed);
 
 	//Debug stages (change stages with space)
 	if (Input::wasKeyPressed(SDL_SCANCODE_SPACE))
@@ -102,52 +73,6 @@ void Game::update(double seconds_elapsed)
 
 	}
 	
-	Vector2 movement;
-	//Read the keyboard state, to see all the keycodes: https://wiki.libsdl.org/SDL_Keycode
-	if (Input::isKeyPressed(SDL_SCANCODE_W)) //up
-	{
-		movement.y -= player.moveSpeed;
-		player.dir = PLAYER_DIR::UP;
-	}
-	if (Input::isKeyPressed(SDL_SCANCODE_S)) //down
-	{
-		movement.y += player.moveSpeed;
-		player.dir = PLAYER_DIR::DOWN;
-	}
-	if (Input::isKeyPressed(SDL_SCANCODE_D)) //right
-	{
-		movement.x += player.moveSpeed;
-		player.dir = PLAYER_DIR::RIGHT;
-	}
-	if (Input::isKeyPressed(SDL_SCANCODE_A)) //left
-	{
-		movement.x -= player.moveSpeed;
-		player.dir = PLAYER_DIR::LEFT;
-	}
-	//update movement
-	player.position += movement * seconds_elapsed;
-	player.isMoving = movement.x != 0.0f || movement.y != 0.0f;
-	//oscilator example
-	music.playMelody();
-
-	//example of 'was pressed'
-	if (Input::wasKeyPressed(SDL_SCANCODE_F)) //if key F was pressed example sound
-	{
-		synth.playSample("data/hit.wav", 1, false);
-	}
-	if (Input::wasKeyPressed(SDL_SCANCODE_Z)) //if key Z was pressed
-	{
-	}
-
-	//to read the gamepad state
-	if (Input::gamepads[0].isButtonPressed(A_BUTTON)) //if the A button is pressed
-	{
-	}
-
-	if (Input::gamepads[0].direction & PAD_UP) //left stick pointing up
-	{
-		bgcolor.set(0, 255, 0);
-	}
 }
 
 //Keyboard event handler (sync input)

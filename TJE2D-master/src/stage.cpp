@@ -1,6 +1,7 @@
 #include "stage.h"
 #include "world.h"
-
+#include "game.h"
+#include "input.h"
 
 
 Stage* GetStage(STAGE_ID id, std::vector<Stage*>& stages) { return stages[(int)id]; };
@@ -33,11 +34,61 @@ void TutorialStage::Update(float seconds_elapsed) {
 }
 
 void PlayStage::Render(Image& framebuffer) {
-	framebuffer.fill(Color::CYAN);
+	Game* game = Game::instance;
+	renderGameMap(framebuffer, game->world.tileset, game->world.map);
+	renderPlayer(game->world.player, &framebuffer, game->time, game->world.sprite);
+	
 }
 
 void PlayStage::Update(float seconds_elapsed) {
+	Game* game = Game::instance;
+	sPlayer* player = &(game->world.player);
+	Vector2 movement;
+	//Read the keyboard state, to see all the keycodes: https://wiki.libsdl.org/SDL_Keycode
+	if (Input::isKeyPressed(SDL_SCANCODE_W)) //up
+	{
+		movement.y -= player->moveSpeed;
+		player->dir = PLAYER_DIR::UP;
+	}
+	if (Input::isKeyPressed(SDL_SCANCODE_S)) //down
+	{
+		movement.y += player->moveSpeed;
+		player->dir = PLAYER_DIR::DOWN;
+	}
+	if (Input::isKeyPressed(SDL_SCANCODE_D)) //right
+	{
+		movement.x += player->moveSpeed;
+		player->dir = PLAYER_DIR::RIGHT;
+	}
+	if (Input::isKeyPressed(SDL_SCANCODE_A)) //left
+	{
+		movement.x -= player->moveSpeed;
+		player->dir = PLAYER_DIR::LEFT;
+	}
+	//update movement
+	player->position += movement * seconds_elapsed;
+	player->isMoving = movement.x != 0.0f || movement.y != 0.0f;
+	//oscilator example
+	Game::instance->world.music.playMelody();
 
+	//example of 'was pressed'
+	if (Input::wasKeyPressed(SDL_SCANCODE_F)) //if key F was pressed example sound
+	{
+		Game::instance->synth.playSample("data/hit.wav", 1, false);
+	}
+	if (Input::wasKeyPressed(SDL_SCANCODE_Z)) //if key Z was pressed
+	{
+	}
+
+	//to read the gamepad state
+	if (Input::gamepads[0].isButtonPressed(A_BUTTON)) //if the A button is pressed
+	{
+	}
+
+	if (Input::gamepads[0].direction & PAD_UP) //left stick pointing up
+	{
+		//bgcolor.set(0, 255, 0);
+	}
 }
 
 void EndStage::Render(Image& framebuffer) {
