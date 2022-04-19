@@ -65,11 +65,25 @@ void PlayStage::Update(float seconds_elapsed) {
 		movement.x -= player->moveSpeed;
 		player->dir = PLAYER_DIR::LEFT;
 	}
+	//collisions
+	Vector2 target = player->position + movement * seconds_elapsed;
+	Vector2 oldPlayerPos = player->position;
+
+	if (isValid(target)) {
+		player->position = target;
+	}
+	else if (isValid(Vector2(target.x,player->position.y))) {
+		player->position = Vector2(target.x, player->position.y);
+	}
+	else if (isValid(Vector2(player->position.x, target.y))) {
+		player->position = Vector2(player->position.x, target.y);
+	}
+
 	//update movement
-	player->position += movement * seconds_elapsed;
-	player->isMoving = movement.x != 0.0f || movement.y != 0.0f;
+	  //player->position += movement * seconds_elapsed;
+	player->isMoving = oldPlayerPos.x != player->position.x || oldPlayerPos.y != player->position.y;
 	//oscilator example
-	Game::instance->world.music.playMelody();
+	    Game::instance->world.music.playMelody();
 
 	//example of 'was pressed'
 	if (Input::wasKeyPressed(SDL_SCANCODE_F)) //if key F was pressed example sound

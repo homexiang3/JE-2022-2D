@@ -3,6 +3,8 @@
 #include "image.h"
 #include "world.h"
 
+const int cellSize = 8;
+
 //example of parser of .map from rogued editor
 GameMap* loadGameMap(const char* filename)
 {
@@ -62,12 +64,47 @@ void renderGameMap(Image& framebuffer, Image tileset, GameMap* map) {
 		}
 };
 
+
+Vector2i WorldToCell(Vector2 worldPos, int cellsize) {
+	return worldPos / cellsize;
+};
+
+bool isValid(Vector2 worldPos) { //mejorable
+	Vector2i cellCoord = WorldToCell(worldPos, cellSize);
+
+	//poliza
+	if (cellCoord.x < 0 || cellCoord.y < 0 || cellCoord.x >= Game::instance->world.map->width || cellCoord.y >= Game::instance->world.map->height)
+	{
+
+		return false;
+	}
+	
+	return  Game::instance->world.map->getCell(cellCoord.x, cellCoord.y).type == 0;//con dos layers preguntar si es navegable o no
+
+};
+
+float EaseInOutSine(float a, float b, float t) {
+	float n = -(cos(PI*t) - 1.0f) / 2.0f;
+	return n * (b - a);
+	/*usage example
+	float lerpTime = 3.0f;
+	float t = fmod(time,lerpTime) /lerTime;
+	float min = 10.0f;
+	float max = 30.0f;
+	float easedT = EaseInOutSine(min,max,t);
+
+	framebuffer.setPixel(min+easedT,10, Color::CYAN);
+	
+	*/
+}
+
 void renderPlayer(sPlayer& player, Image* framebuffer, float time, Image sprite) {
 
 	int start_x = (int(time * player.animSpeed) % 4) * player.spriteWidth;
 	start_x = player.isMoving ? start_x : 0;
 	int start_y = (int)player.dir * player.spriteHeight;
-	framebuffer->drawImage(sprite, player.position.x, player.position.y, Area(start_x, start_y, player.spriteWidth, player.spriteHeight));
+	framebuffer->drawImage(sprite, player.position.x - player.spriteWidth/2, player.position.y - player.spriteHeight/1.2, Area(start_x, start_y, player.spriteWidth, player.spriteHeight));
+	
 
 };
 

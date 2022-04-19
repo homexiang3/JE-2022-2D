@@ -57,6 +57,11 @@ struct sMapHeader {
 	unsigned char extra[7]; //filling bytes, not used
 };
 
+Vector2i WorldToCell(Vector2 worldPos, int cellsize);
+
+bool isValid(Vector2 worldPos);
+
+float EaseInOutSine(float a, float b, float t);
 //PLAYER FUNCTIONS
 
 enum PLAYER_DIR {
@@ -67,7 +72,7 @@ enum PLAYER_DIR {
 };
 
 struct sPlayer {
-	Vector2 position;
+	Vector2 position = Vector2(10,10);
 	bool isMoving = false;
 	PLAYER_DIR dir = DOWN;
 	//prev constants of game
@@ -111,9 +116,11 @@ public:
 	//map functions
 	Image tileset;
 	GameMap* map;
+	std::vector<GameMap*> maps; //cargas fichero level_db.txt y metes todos los niveles en maps
 
 	void loadWorld();
 };
+
 
 
 #endif
