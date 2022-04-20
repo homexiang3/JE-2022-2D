@@ -23,6 +23,9 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	time = 0.0f;
 	elapsed_time = 0.0f;
 
+	framebuffer_width = 160;
+	framebuffer_height = 120;
+
 	//load world
 	world.loadWorld();
 	//stages
@@ -30,7 +33,6 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	
 
 	enableAudio(); //enable this line if you plan to add audio to your application
-	//synth.playSample("data/coin.wav",1,true);
 	synth.osc1.amplitude = 0.5;
 
 }
@@ -39,7 +41,7 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 void Game::render(void)
 {
 	//Create a new Image (or we could create a global one if we want to keep the previous frame)
-	Image framebuffer(160, 120); //do not change framebuffer size
+	Image framebuffer(framebuffer_width, framebuffer_height); //do not change framebuffer size
 
 	//add your code here to fill the framebuffer
 		GetCurrentStage(world.currentStage,world.stages)->Render(framebuffer);
@@ -51,7 +53,7 @@ void Game::render(void)
 		//framebuffer.drawImage( sprite, 0, 0, framebuffer.width, framebuffer.height );			//draws a scaled image
 		//framebuffer.drawImage( sprite, 0, 0, Area(0,0,14,18) );	//draws only a part of an image
 		//framebuffer.drawText( "Hello World", 0, 0, font );				//draws some text using a bitmap font in an image (assuming every char is 7x9)
-		//framebuffer.drawText( toString(time), 1, 10, minifont,4,6);	//draws some text using a bitmap font in an image (assuming every char is 4x6)
+		//framebuffer.drawText( toString(time), 1, 10, world.minifont,4,6);	//draws some text using a bitmap font in an image (assuming every char is 4x6)
 
 	//send image to screen
 	showFramebuffer(&framebuffer);
@@ -59,7 +61,6 @@ void Game::render(void)
 
 void Game::update(double seconds_elapsed)
 {	
-
 	//Update with stages
 	GetCurrentStage(world.currentStage,world.stages)->Update(seconds_elapsed);
 

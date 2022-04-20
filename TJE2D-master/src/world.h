@@ -2,19 +2,24 @@
 #define WORLD_H
 
 #include "stage.h"
+#include "includes.h"
+
 //MAP FUNCTIONS
 
 enum eCellType : uint8 {
-	EMPTY, START,
+	EMPTY, 
+	START,
 	WALL,
 	DOOR,
-	CHEST
+	TOTEM,
+	WATER, 
+	FLOOR
 };
 
 enum eItemType : uint8 {
 	NOTHING,
-	SWORD,
-	POTION
+	//SWORD,
+	//POTION
 };
 
 struct sCell {
@@ -22,10 +27,21 @@ struct sCell {
 	eItemType item;
 };
 
+struct sMapHeader {
+	int w; //width of map
+	int h; //height of map
+	unsigned char bytes; //num bytes per cell
+	unsigned char extra[7]; //filling bytes, not used
+};
+
 class GameMap {
 public:
 	int width;
 	int height;
+
+	//Vector2i spawnPoint;
+	//std::vector<Vector2i> enemySpawnPoints;
+
 	sCell* data;
 
 	GameMap()
@@ -49,20 +65,17 @@ public:
 };
 
 GameMap* loadGameMap(const char* filename);
-void renderGameMap(Image& framebuffer, Image tileset, GameMap* map);
+void renderGameMap(Image& framebuffer, Image tileset, GameMap* map, SDL_Rect camera);
 
-struct sMapHeader {
-	int w; //width of map
-	int h; //height of map
-	unsigned char bytes; //num bytes per cell
-	unsigned char extra[7]; //filling bytes, not used
-};
-
+//We assume maps always starts at (0,0)
 Vector2i WorldToCell(Vector2 worldPos, int cellsize);
+Vector2 CellToWorld(Vector2i cellPos, int cellsize);
+Vector2 CellToWorldCenter(Vector2i cellPos, int cellsize);
 
 bool isValid(Vector2 worldPos);
 
 float EaseInOutSine(float a, float b, float t);
+
 //PLAYER FUNCTIONS
 
 enum PLAYER_DIR {
@@ -72,8 +85,9 @@ enum PLAYER_DIR {
 	UP = 3
 };
 
-struct sPlayer {
-	Vector2 position = Vector2(10,10);
+class sPlayer {
+public:
+	Vector2 position = Vector2(30,30);
 	bool isMoving = false;
 	PLAYER_DIR dir = DOWN;
 	//prev constants of game
@@ -81,13 +95,11 @@ struct sPlayer {
 	float animSpeed = 4.0f;
 	int spriteWidth = 14;
 	int spriteHeight = 18;
+
+	void renderPlayer( Image* framebuffer, float time, Image sprite, SDL_Rect camera);
 };
 
-void renderPlayer(sPlayer& player, Image* framebuffer, float time, Image sprite);
 
-struct sCamera {
-	Vector2 position;
-};
 
 //Music class
 
@@ -96,6 +108,7 @@ public:
 	int notes[5] = { 45,75,60,72,82 };
 	float noteSpeed = 2.0f;
 	int notesLength();
+
 	void playMelody();
 };
 
@@ -111,7 +124,7 @@ public:
 	//Color bgcolor(130, 80, 100);
 	//added player from world.h
 	sPlayer player;
-	sCamera camera;
+	SDL_Rect camera;
 	//constants of the game
 	synthMusic music;
 	//map functions

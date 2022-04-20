@@ -3,6 +3,7 @@
 #include "game.h"
 #include "input.h"
 
+//STAGE UTIL FUNCTIONS
 
 Stage* GetStage(STAGE_ID id, std::vector<Stage*>& stages) { return stages[(int)id]; };
 Stage* GetCurrentStage(STAGE_ID currentStage, std::vector<Stage*>& stages) { return GetStage(currentStage, stages); };
@@ -17,6 +18,8 @@ void InitStages(std::vector<Stage*>& stages) {
 	stages.push_back(new PlayStage());
 	stages.push_back(new EndStage());
 }
+
+//INTRO STAGE
 
 void IntroStage::Render(Image& framebuffer) {
 	framebuffer.drawImage(Game::instance->world.intro, 0, 0);
@@ -34,6 +37,7 @@ void IntroStage::Update(float seconds_elapsed) {
 	}
 }
 
+//TUTORIAL STAGE
 
 void TutorialStage::Render(Image& framebuffer) {
 
@@ -54,16 +58,19 @@ void TutorialStage::Update(float seconds_elapsed) {
 	}
 }
 
+//PLAY STAGE
+
 void PlayStage::Render(Image& framebuffer) {
 	Game* game = Game::instance;
-	renderGameMap(framebuffer, game->world.tileset, game->world.map);
-	renderPlayer(game->world.player, &framebuffer, game->time, game->world.sprite);
+	renderGameMap(framebuffer, game->world.tileset, game->world.map, game->world.camera);
+	game->world.player.renderPlayer( &framebuffer, game->time, game->world.sprite, game->world.camera);
 	
 }
 
 void PlayStage::Update(float seconds_elapsed) {
 	Game* game = Game::instance;
 	sPlayer* player = &(game->world.player);
+	SDL_Rect* camera = &(game->world.camera);
 	Vector2 movement;
 	//Read the keyboard state, to see all the keycodes: https://wiki.libsdl.org/SDL_Keycode
 	if (Input::isKeyPressed(SDL_SCANCODE_W)) //up
@@ -92,30 +99,43 @@ void PlayStage::Update(float seconds_elapsed) {
 
 	if (isValid(target)) {
 		player->position = target;
+
+		camera->x = target.x - camera->w / 2;
+		camera->y = target.y - camera->h / 2;
+		
 	}
 	else if (isValid(Vector2(target.x,player->position.y))) {
 		player->position = Vector2(target.x, player->position.y);
+
+		camera->x = target.x - camera->w / 2;
+		camera->y = player->position.y - camera->h / 2;
 	}
 	else if (isValid(Vector2(player->position.x, target.y))) {
 		player->position = Vector2(player->position.x, target.y);
+
+		camera->x = player->position.x - camera->w / 2;
+		camera->y = target.y - camera->h / 2;
 	}
+	//camera comprovations
+	if (camera->x < 0) { camera->x = 0; }
+	if (camera->y < 0) { camera->y = 0; }
+	if (camera ->x > camera ->w) { camera->x = camera->w; }
+	if (camera->y > camera->h) { camera->y = camera->h; }
 
 	//update movement
 	  //player->position += movement * seconds_elapsed;
-	player->isMoving = oldPlayerPos.x != player->position.x || oldPlayerPos.y != player->position.y;
+		player->isMoving = oldPlayerPos.x != player->position.x || oldPlayerPos.y != player->position.y;
 	//oscilator example
 	    Game::instance->world.music.playMelody();
 
-	//example of 'was pressed'
+
+	//example of 'was pressed'DEBUG SOUNDS
 	if (Input::wasKeyPressed(SDL_SCANCODE_F)) //if key F was pressed example sound
 	{
 		Game::instance->synth.playSample("data/hit.wav", 1, false);
 	}
-	if (Input::wasKeyPressed(SDL_SCANCODE_Z)) //if key Z was pressed
-	{
-	}
 
-	//to read the gamepad state
+	/*to read the gamepad state
 	if (Input::gamepads[0].isButtonPressed(A_BUTTON)) //if the A button is pressed
 	{
 	}
@@ -123,8 +143,10 @@ void PlayStage::Update(float seconds_elapsed) {
 	if (Input::gamepads[0].direction & PAD_UP) //left stick pointing up
 	{
 		//bgcolor.set(0, 255, 0);
-	}
+	}*/
 }
+
+//END STAGE
 
 void EndStage::Render(Image& framebuffer) {
 	Game::instance->synth.osc1.amplitude = 0;

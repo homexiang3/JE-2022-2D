@@ -27,6 +27,8 @@ public:
 	float elapsed_time;
 	int fps;
 	bool must_exit;
+	int framebuffer_height;
+	int framebuffer_width;
 	//world var
 	World world;
 	//audio
