@@ -67,12 +67,6 @@ public:
 GameMap* loadGameMap(const char* filename);
 void renderGameMap(Image& framebuffer, Image tileset, GameMap* map, SDL_Rect camera);
 
-//We assume maps always starts at (0,0)
-Vector2i WorldToCell(Vector2 worldPos, int cellsize);
-Vector2 CellToWorld(Vector2i cellPos, int cellsize);
-Vector2 CellToWorldCenter(Vector2i cellPos, int cellsize);
-
-bool isValid(Vector2 worldPos);
 
 float EaseInOutSine(float a, float b, float t);
 
@@ -138,6 +132,13 @@ public:
 	void loadWorld();
 };
 
+//We assume maps always starts at (0,0)
+Vector2i WorldToCell(Vector2 worldPos, int cellsize);
+Vector2 CellToWorld(Vector2i cellPos, int cellsize);
+Vector2 CellToWorldCenter(Vector2i cellPos, int cellsize);
 
+bool isValid(Vector2 worldPos);
+bool isTotem(Vector2 worldPos);
+void totemLogic(Vector2 totemPos, sPlayer* player);
 
 #endif

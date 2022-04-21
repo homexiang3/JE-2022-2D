@@ -74,6 +74,36 @@ Vector2 CellToWorld(Vector2i cellPos, int cellsize) { //esquina superior izquier
 Vector2 CellToWorldCenter(Vector2i cellPos, int cellsize) { //center
 
 	return (cellPos * cellSize) + Vector2i(cellsize/2,cellsize/2) ;
+
+}
+
+bool isTotem(Vector2 worldPos) {
+	Vector2i cellCoord = WorldToCell(worldPos, cellSize);
+	return  Game::instance->world.map->getCell(cellCoord.x, cellCoord.y).type == 11;
+}
+
+void totemLogic(Vector2 totemPos, sPlayer* player) {
+	Vector2i totemCell = WorldToCell(totemPos, cellSize);
+	Vector2i playerCell = WorldToCell(player->position, cellSize);
+
+	Game::instance->world.map->getCell(totemCell.x, totemCell.y).type = (eCellType)8;
+
+	if (playerCell.x < totemCell.x && player->dir == RIGHT) {
+		
+		totemCell.x += 1;
+	}
+	if (playerCell.x >= totemCell.x && player->dir == LEFT) {
+
+		totemCell.x -= 1;
+	}
+	if (playerCell.y < totemCell.y && player->dir == DOWN) {
+
+		totemCell.y += 1;
+	}
+	if (playerCell.y >= totemCell.y && player->dir == UP) {
+		totemCell.y -= 1;
+	}
+	Game::instance->world.map->getCell(totemCell.x, totemCell.y).type = (eCellType)11;
 }
 
 bool isValid(Vector2 worldPos) { //mejorable
@@ -86,7 +116,7 @@ bool isValid(Vector2 worldPos) { //mejorable
 		return false;
 	}
 	
-	return  Game::instance->world.map->getCell(cellCoord.x, cellCoord.y).type == 0;//con dos layers preguntar si es navegable o no
+	return  Game::instance->world.map->getCell(cellCoord.x, cellCoord.y).type == 8;//con dos layers preguntar si es navegable o no
 
 };
 

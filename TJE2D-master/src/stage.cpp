@@ -97,7 +97,12 @@ void PlayStage::Update(float seconds_elapsed) {
 	Vector2 target = player->position + movement * seconds_elapsed;
 	Vector2 oldPlayerPos = player->position;
 
-	if (isValid(target)) {
+	if (isTotem(target)) {
+		Vector2i cellCoord = WorldToCell(target, 8);
+		totemLogic(target, player);
+	}
+
+	else if (isValid(target)) {
 		player->position = target;
 
 		camera->x = target.x - camera->w / 2;
