@@ -84,9 +84,10 @@ enum PLAYER_DIR {
 
 class sPlayer {
 public:
-	Vector2 position = Vector2(30,30);
+	Vector2 position = Vector2(60,60);
 	bool isMoving = false;
 	PLAYER_DIR dir = DOWN;
+	bool isDead = false;
 	//prev constants of game
 	float moveSpeed = 50.0f;
 	float animSpeed = 4.0f;
@@ -96,7 +97,14 @@ public:
 	void renderPlayer( Image* framebuffer, float time, Image sprite, Vector2 camOffset);
 };
 
+struct Sprite {
+	Vector2 position = Vector2(90, 90);
+	Image sprite;
+	int spriteWidth = 8;
+	int spriteHeight = 12;
+};
 
+void renderSprite(Image* framebuffer, Sprite sprite, Vector2 camOffset);
 
 //Music class
 
@@ -118,6 +126,7 @@ public:
 	Image minifont;
 	Image sprite;
 	Image intro;
+	Sprite totem;
 	//Color bgcolor(130, 80, 100);
 	//added player from world.h
 	sPlayer player;
@@ -142,7 +151,7 @@ Vector2 CellToWorld(Vector2i cellPos, int cellsize);
 Vector2 CellToWorldCenter(Vector2i cellPos, int cellsize);
 
 bool isValid(Vector2 worldPos);
-bool isTotem(Vector2 worldPos);
-void totemLogic(Vector2 totemPos, sPlayer* player);
+bool isTotem(Vector2 worldPos, Vector2 totemPos);
+void totemLogic(Sprite* totem, sPlayer* player);
 
 #endif

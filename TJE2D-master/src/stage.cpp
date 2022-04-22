@@ -60,23 +60,17 @@ void TutorialStage::Update(float seconds_elapsed) {
 
 //PLAY STAGE
 
-Vector2 computeCamera(Vector2 playerPos, Vector2 playerToCam, int w, int h) {
-
-	Vector2 camera = playerPos + playerToCam;
-	//avoid out of screen bounds
-	if (camera.x < 0) { camera.x = 0; }
-	if (camera.y < 0) { camera.y = 0; }
-	if (camera.x > w) { camera.x = w ; }
-	if (camera.y > h) { camera.y = h; }
-
-	return camera;
-}
-
 void PlayStage::Render(Image& framebuffer) {
 	Game* game = Game::instance;
+	//calculate camera
 	game->world.camOffset = computeCamera(game->world.player.position, game->world.playerToCam, game->framebuffer_width, game->framebuffer_height);
+	//render map
 	renderGameMap(framebuffer, game->world.tileset, game->world.map, game->world.camOffset);
+	//render enemies/totems
+	renderSprite(&framebuffer, game->world.totem, game->world.camOffset);
+	//render player
 	game->world.player.renderPlayer( &framebuffer, game->time, game->world.sprite, game->world.camOffset);
+
 	
 }
 
@@ -109,12 +103,11 @@ void PlayStage::Update(float seconds_elapsed) {
 	Vector2 target = player->position + movement * seconds_elapsed;
 	Vector2 oldPlayerPos = player->position;
 
-	if (isTotem(target)) {
-		Vector2i cellCoord = WorldToCell(target, 8);
-		totemLogic(target, player);
-	}
+	/*if (isTotem(target, game->world.totem.position)) {
+		totemLogic(&(game->world.totem), player);
+	}*/
 
-	else if (isValid(target)) {
+	if (isValid(target)) {
 		player->position = target;	
 	}
 	else if (isValid(Vector2(target.x,player->position.y))) {

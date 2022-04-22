@@ -77,16 +77,28 @@ Vector2 CellToWorldCenter(Vector2i cellPos, int cellsize) { //center
 
 }
 
-bool isTotem(Vector2 worldPos) {
-	Vector2i cellCoord = WorldToCell(worldPos, cellSize);
-	return  Game::instance->world.map->getCell(cellCoord.x, cellCoord.y).type == 11;
+Vector2 computeCamera(Vector2 playerPos, Vector2 playerToCam, int w, int h) {
+
+	Vector2 camera = playerPos + playerToCam;
+	//avoid out of screen bounds
+	if (camera.x < 0) { camera.x = 0; }
+	if (camera.y < 0) { camera.y = 0; }
+	if (camera.x > w) { camera.x = w; }
+	if (camera.y > h) { camera.y = h; }
+
+	return camera;
 }
 
-void totemLogic(Vector2 totemPos, sPlayer* player) {
-	Vector2i totemCell = WorldToCell(totemPos, cellSize);
+bool isTotem(Vector2 worldPos, Vector2 totemPos) {
+	Vector2i playerCell = WorldToCell(worldPos, cellSize);
+	Vector2i totemCell = WorldToCell(worldPos, cellSize);
+	return  playerCell == totemCell;
+}
+
+void totemLogic(Sprite* totem, sPlayer* player) {
+	Vector2i totemCell = WorldToCell(totem->position, cellSize);
 	Vector2i playerCell = WorldToCell(player->position, cellSize);
 
-	Game::instance->world.map->getCell(totemCell.x, totemCell.y).type = (eCellType)8;
 
 	if (playerCell.x < totemCell.x && player->dir == RIGHT) {
 		
@@ -103,7 +115,11 @@ void totemLogic(Vector2 totemPos, sPlayer* player) {
 	if (playerCell.y >= totemCell.y && player->dir == UP) {
 		totemCell.y -= 1;
 	}
-	Game::instance->world.map->getCell(totemCell.x, totemCell.y).type = (eCellType)11;
+
+	totem->position = CellToWorld(totemCell,cellSize);
+
+	
+	std::cout << playerCell.x << playerCell.y << std::endl;
 }
 
 bool isValid(Vector2 worldPos) { //mejorable
@@ -146,6 +162,10 @@ void sPlayer::renderPlayer( Image* framebuffer, float time, Image sprite, Vector
 
 };
 
+void renderSprite(Image* framebuffer, Sprite sprite, Vector2 camOffset) {
+	framebuffer->drawImage(sprite.sprite, sprite.position.x-camOffset.x, sprite.position.y-camOffset.y);
+}
+
 int synthMusic::notesLength() {
 	return sizeof(this->notes) / sizeof(this->notes[0]);
 }
@@ -162,6 +182,7 @@ void World::loadWorld() {
 	minifont.loadTGA("data/mini-font-white-4x6.tga"); //load bitmap-font image
 	sprite.loadTGA("data/astronaut.tga"); //example to load an sprite
 	intro.loadTGA("data/intro.tga");
+	totem.sprite.loadTGA("data/totem.tga");
 
 	//read file example
 		//std::string s;
