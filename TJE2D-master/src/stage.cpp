@@ -65,7 +65,7 @@ void PlayStage::Render(Image& framebuffer) {
 	//calculate camera
 	game->world.camOffset = computeCamera(game->world.player.position, game->world.playerToCam, game->framebuffer_width, game->framebuffer_height);
 	//render map
-	renderGameMap(framebuffer, game->world.tileset, game->world.map, game->world.camOffset);
+	renderGameMap(framebuffer, game->world.tileset, GetCurrentMap(game->world.player.currentMap, game->world.maps), game->world.camOffset);
 	//render enemies/totems
 	renderSprite(&framebuffer, game->world.totem, game->world.camOffset);
 	//render player
@@ -77,6 +77,7 @@ void PlayStage::Render(Image& framebuffer) {
 void PlayStage::Update(float seconds_elapsed) {
 	Game* game = Game::instance;
 	sPlayer* player = &(game->world.player);
+	Sprite* totem = &(game->world.totem);
 	Vector2 movement;
 	//Read the keyboard state, to see all the keycodes: https://wiki.libsdl.org/SDL_Keycode
 	if (Input::isKeyPressed(SDL_SCANCODE_W)) //up
@@ -103,17 +104,18 @@ void PlayStage::Update(float seconds_elapsed) {
 	Vector2 target = player->position + movement * seconds_elapsed;
 	Vector2 oldPlayerPos = player->position;
 
-	/*if (isTotem(target, game->world.totem.position)) {
-		totemLogic(&(game->world.totem), player);
-	}*/
+	if (isTotem(target, totem->position)) {
+		totemLogic(totem, player);
+		openDoor(totem, GetCurrentMap(game->world.player.currentMap, game->world.maps));
+	}
 
-	if (isValid(target)) {
+	if (isValid(target, GetCurrentMap(game->world.player.currentMap, game->world.maps))) {
 		player->position = target;	
 	}
-	else if (isValid(Vector2(target.x,player->position.y))) {
+	else if (isValid(Vector2(target.x,player->position.y), GetCurrentMap(game->world.player.currentMap, game->world.maps))) {
 		player->position = Vector2(target.x, player->position.y);
 	}
-	else if (isValid(Vector2(player->position.x, target.y))) {
+	else if (isValid(Vector2(player->position.x, target.y), GetCurrentMap(game->world.player.currentMap, game->world.maps))) {
 		player->position = Vector2(player->position.x, target.y);
 	}
 	//update movement

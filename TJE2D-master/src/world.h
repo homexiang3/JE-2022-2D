@@ -88,6 +88,7 @@ public:
 	bool isMoving = false;
 	PLAYER_DIR dir = DOWN;
 	bool isDead = false;
+	int currentMap = 0;
 	//prev constants of game
 	float moveSpeed = 50.0f;
 	float animSpeed = 4.0f;
@@ -136,22 +137,28 @@ public:
 	synthMusic music;
 	//map functions
 	Image tileset;
-	GameMap* map;
 	std::vector<GameMap*> maps; //cargas fichero level_db.txt y metes todos los niveles en maps
 	//stages
 	std::vector<Stage*> stages;
 	STAGE_ID currentStage = STAGE_ID::PLAY;
 
 	void loadWorld();
+
 };
+
+/*GameMap* GetMap(int id, std::vector<GameMap*> &maps) { return maps[(int)id]; };
+GameMap* GetCurrentMap(int currentMap, std::vector<GameMap*> &maps) { return GetMap(currentMap, maps); };
+void SetMap(int id, int &currentMap) { currentMap = id; };*/
+void InitMaps(std::vector<GameMap*> &maps);
 
 //We assume maps always starts at (0,0)
 Vector2i WorldToCell(Vector2 worldPos, int cellsize);
 Vector2 CellToWorld(Vector2i cellPos, int cellsize);
 Vector2 CellToWorldCenter(Vector2i cellPos, int cellsize);
 
-bool isValid(Vector2 worldPos);
+bool isValid(Vector2 worldPos, GameMap* map);
 bool isTotem(Vector2 worldPos, Vector2 totemPos);
 void totemLogic(Sprite* totem, sPlayer* player);
+void openDoor(Sprite* totem, GameMap* map);
 
 #endif

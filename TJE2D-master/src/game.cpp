@@ -28,8 +28,6 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 
 	//load world
 	world.loadWorld();
-	//stages
-	InitStages(world.stages);
 	
 
 	enableAudio(); //enable this line if you plan to add audio to your application

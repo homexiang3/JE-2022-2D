@@ -91,7 +91,7 @@ Vector2 computeCamera(Vector2 playerPos, Vector2 playerToCam, int w, int h) {
 
 bool isTotem(Vector2 worldPos, Vector2 totemPos) {
 	Vector2i playerCell = WorldToCell(worldPos, cellSize);
-	Vector2i totemCell = WorldToCell(worldPos, cellSize);
+	Vector2i totemCell = WorldToCell(totemPos, cellSize);
 	return  playerCell == totemCell;
 }
 
@@ -117,24 +117,31 @@ void totemLogic(Sprite* totem, sPlayer* player) {
 	}
 
 	totem->position = CellToWorld(totemCell,cellSize);
-
-	
-	std::cout << playerCell.x << playerCell.y << std::endl;
+	//int distance = playerCell.distance(totemCell);
+	//std::cout << distance << std::endl;
 }
 
-bool isValid(Vector2 worldPos) { //mejorable
+bool isValid(Vector2 worldPos, GameMap* map) { //mejorable
 	Vector2i cellCoord = WorldToCell(worldPos, cellSize);
 
 	//poliza
-	if (cellCoord.x < 0 || cellCoord.y < 0 || cellCoord.x >= Game::instance->world.map->width || cellCoord.y >= Game::instance->world.map->height)
+	if (cellCoord.x < 0 || cellCoord.y < 0 || cellCoord.x >= map->width || cellCoord.y >= map->height)
 	{
 
 		return false;
 	}
 	
-	return  Game::instance->world.map->getCell(cellCoord.x, cellCoord.y).type == 8;//con dos layers preguntar si es navegable o no
+	return  map->getCell(cellCoord.x, cellCoord.y).type == 8 || map->getCell(cellCoord.x, cellCoord.y).type == 9;//con dos layers preguntar si es navegable o no
 
 };
+
+void openDoor(Sprite* totem, GameMap* map) {
+	Vector2i totemCell = WorldToCell(totem->position, cellSize);
+	
+	if (map->getCell(totemCell.x, totemCell.y).type == 10) {
+		std::cout << "win" << std::endl;
+	}
+}
 
 float EaseInOutSine(float a, float b, float t) {
 	float n = -(cos(PI*t) - 1.0f) / 2.0f;
@@ -175,9 +182,24 @@ void synthMusic::playMelody() {
 	int noteIndex = int(Game::instance->time*this->noteSpeed) % length;
 	Game::instance->synth.osc1.setNote(this->notes[noteIndex]);
 }
+void InitMaps(std::vector<GameMap*>& maps) {
 
+	GameMap* map;
+
+	std::string s;
+	readFile("data/levels_db.txt", s);
+	std::istringstream f(s);
+	while (std::getline(f, s)) {
+		const char * c = s.c_str();
+		std::cout << c << std::endl;
+		map = loadGameMap(c);
+		maps.push_back(map);
+	}
+}
 void World::loadWorld() {
-
+	//constants
+	playerToCam = Vector2(-Game::instance->framebuffer_width / 2, -Game::instance->framebuffer_height / 2);
+	//load sprites
 	font.loadTGA("data/bitmap-font-white.tga"); //load bitmap-font image
 	minifont.loadTGA("data/mini-font-white-4x6.tga"); //load bitmap-font image
 	sprite.loadTGA("data/astronaut.tga"); //example to load an sprite
@@ -189,9 +211,9 @@ void World::loadWorld() {
 		//readFile("data/test.txt", s);
 		//std::cout << s << std::endl;
 
-	//load map/tileset example
+	//load map/tileset/stages example
 	tileset.loadTGA("data/tileset.tga");
-	map = loadGameMap("data/mymap.map");
+	InitMaps(maps);
+	InitStages(stages);
 
-	playerToCam = Vector2(-Game::instance->framebuffer_width/2,-Game::instance->framebuffer_height/2);
 }
