@@ -33,7 +33,7 @@ GameMap* loadGameMap(const char* filename)
 	return map;
 };
 
-void renderGameMap(Image& framebuffer, Image tileset, GameMap* map, SDL_Rect camera) {
+void renderGameMap(Image& framebuffer, Image tileset, GameMap* map, Vector2 camOffset) {
 	//size in pixels of a cell, we assume every row has 16 cells so the cell size must be image.width / 16
 	int cs = tileset.width / 16;
 	//for every cell
@@ -49,11 +49,11 @@ void renderGameMap(Image& framebuffer, Image tileset, GameMap* map, SDL_Rect cam
 			int tilex = (type % 16) * cs; 	//x pos in tileset
 			int tiley = floor(type / 16) * cs;	//y pos in tileset
 			Area area(tilex, tiley, cs, cs); //tile area
-			int screenx = (x * cs)-camera.x;//place offset here if you want
-			int screeny = (y * cs)-camera.y;
+			int screenx = (x * cs)-camOffset.x;//place offset here if you want
+			int screeny = (y * cs)-camOffset.y;
 			//avoid rendering out of screen stuff
-			if (screenx < -cs || screenx > framebuffer.width ||
-				screeny < -cs || screeny > framebuffer.height)
+			if (screenx < -cs || screenx > (int)framebuffer.width ||
+				screeny < -cs || screeny > (int)framebuffer.height)
 				continue;
 			//draw region of tileset inside framebuffer
 			framebuffer.drawImage(tileset, 		//image
@@ -135,12 +135,13 @@ float EaseInOutSine(float a, float b, float t) {
 	*/
 }
 
-void sPlayer::renderPlayer( Image* framebuffer, float time, Image sprite, SDL_Rect camera) {
+void sPlayer::renderPlayer( Image* framebuffer, float time, Image sprite, Vector2 camOffset) {
 
 	int start_x = (int(time * this->animSpeed) % 4) * this->spriteWidth;
 	start_x = this->isMoving ? start_x : 0;
 	int start_y = (int)this->dir * this->spriteHeight;
-	framebuffer->drawImage(sprite, this->position.x - this->spriteWidth/2 - camera.x ,this->position.y - this->spriteHeight/1.2 - camera.y, Area(start_x, start_y, this->spriteWidth, this->spriteHeight));
+	Vector2 playerRender = this->position - camOffset;
+	framebuffer->drawImage(sprite, playerRender.x - this->spriteWidth/2 ,playerRender.y - this->spriteHeight/1.2, Area(start_x, start_y, this->spriteWidth, this->spriteHeight));
 	
 
 };
@@ -171,5 +172,5 @@ void World::loadWorld() {
 	tileset.loadTGA("data/tileset.tga");
 	map = loadGameMap("data/mymap.map");
 
-	camera = { 0,0,Game::instance->framebuffer_width,Game::instance->framebuffer_height };
+	playerToCam = Vector2(-Game::instance->framebuffer_width/2,-Game::instance->framebuffer_height/2);
 }

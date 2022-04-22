@@ -60,17 +60,29 @@ void TutorialStage::Update(float seconds_elapsed) {
 
 //PLAY STAGE
 
+Vector2 computeCamera(Vector2 playerPos, Vector2 playerToCam, int w, int h) {
+
+	Vector2 camera = playerPos + playerToCam;
+	//avoid out of screen bounds
+	if (camera.x < 0) { camera.x = 0; }
+	if (camera.y < 0) { camera.y = 0; }
+	if (camera.x > w) { camera.x = w ; }
+	if (camera.y > h) { camera.y = h; }
+
+	return camera;
+}
+
 void PlayStage::Render(Image& framebuffer) {
 	Game* game = Game::instance;
-	renderGameMap(framebuffer, game->world.tileset, game->world.map, game->world.camera);
-	game->world.player.renderPlayer( &framebuffer, game->time, game->world.sprite, game->world.camera);
+	game->world.camOffset = computeCamera(game->world.player.position, game->world.playerToCam, game->framebuffer_width, game->framebuffer_height);
+	renderGameMap(framebuffer, game->world.tileset, game->world.map, game->world.camOffset);
+	game->world.player.renderPlayer( &framebuffer, game->time, game->world.sprite, game->world.camOffset);
 	
 }
 
 void PlayStage::Update(float seconds_elapsed) {
 	Game* game = Game::instance;
 	sPlayer* player = &(game->world.player);
-	SDL_Rect* camera = &(game->world.camera);
 	Vector2 movement;
 	//Read the keyboard state, to see all the keycodes: https://wiki.libsdl.org/SDL_Keycode
 	if (Input::isKeyPressed(SDL_SCANCODE_W)) //up
@@ -103,30 +115,14 @@ void PlayStage::Update(float seconds_elapsed) {
 	}
 
 	else if (isValid(target)) {
-		player->position = target;
-
-		camera->x = target.x - camera->w / 2;
-		camera->y = target.y - camera->h / 2;
-		
+		player->position = target;	
 	}
 	else if (isValid(Vector2(target.x,player->position.y))) {
 		player->position = Vector2(target.x, player->position.y);
-
-		camera->x = target.x - camera->w / 2;
-		camera->y = player->position.y - camera->h / 2;
 	}
 	else if (isValid(Vector2(player->position.x, target.y))) {
 		player->position = Vector2(player->position.x, target.y);
-
-		camera->x = player->position.x - camera->w / 2;
-		camera->y = target.y - camera->h / 2;
 	}
-	//camera comprovations
-	if (camera->x < 0) { camera->x = 0; }
-	if (camera->y < 0) { camera->y = 0; }
-	if (camera ->x > camera ->w) { camera->x = camera->w; }
-	if (camera->y > camera->h) { camera->y = camera->h; }
-
 	//update movement
 	  //player->position += movement * seconds_elapsed;
 		player->isMoving = oldPlayerPos.x != player->position.x || oldPlayerPos.y != player->position.y;

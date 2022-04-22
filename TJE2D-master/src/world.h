@@ -65,10 +65,13 @@ public:
 };
 
 GameMap* loadGameMap(const char* filename);
-void renderGameMap(Image& framebuffer, Image tileset, GameMap* map, SDL_Rect camera);
+void renderGameMap(Image& framebuffer, Image tileset, GameMap* map, Vector2 camOffset);
 
 
 float EaseInOutSine(float a, float b, float t);
+
+//CAMERA
+Vector2 computeCamera(Vector2 playerPos, Vector2 playerToCam, int w, int h);
 
 //PLAYER FUNCTIONS
 
@@ -90,7 +93,7 @@ public:
 	int spriteWidth = 14;
 	int spriteHeight = 18;
 
-	void renderPlayer( Image* framebuffer, float time, Image sprite, SDL_Rect camera);
+	void renderPlayer( Image* framebuffer, float time, Image sprite, Vector2 camOffset);
 };
 
 
@@ -118,7 +121,8 @@ public:
 	//Color bgcolor(130, 80, 100);
 	//added player from world.h
 	sPlayer player;
-	SDL_Rect camera;
+	Vector2 camOffset;
+	Vector2 playerToCam;
 	//constants of the game
 	synthMusic music;
 	//map functions
