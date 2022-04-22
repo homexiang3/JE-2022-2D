@@ -146,9 +146,9 @@ public:
 
 };
 
-/*GameMap* GetMap(int id, std::vector<GameMap*> &maps) { return maps[(int)id]; };
-GameMap* GetCurrentMap(int currentMap, std::vector<GameMap*> &maps) { return GetMap(currentMap, maps); };
-void SetMap(int id, int &currentMap) { currentMap = id; };*/
+GameMap* GetMap(int id, std::vector<GameMap*> &maps);
+GameMap* GetCurrentMap(int currentMap, std::vector<GameMap*> &maps);
+void SetMap(int id, int &currentMap);
 void InitMaps(std::vector<GameMap*> &maps);
 
 //We assume maps always starts at (0,0)

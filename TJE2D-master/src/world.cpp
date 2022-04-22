@@ -182,19 +182,42 @@ void synthMusic::playMelody() {
 	int noteIndex = int(Game::instance->time*this->noteSpeed) % length;
 	Game::instance->synth.osc1.setNote(this->notes[noteIndex]);
 }
+
+
+GameMap* GetMap(int id, std::vector<GameMap*> &maps) { return maps[id]; };
+GameMap* GetCurrentMap(int currentMap, std::vector<GameMap*> &maps) { return GetMap(currentMap, maps); };
+void SetMap(int id, int &currentMap) { currentMap = id; };
+
 void InitMaps(std::vector<GameMap*>& maps) {
 
-	GameMap* map;
+	GameMap* map1;
+	GameMap* map2;
+	GameMap* map3;
+	GameMap* map4;
 
-	std::string s;
+	map1 = loadGameMap("data/map_00.map");
+	maps.push_back(map1);
+	map2 = loadGameMap("data/map_01.map");
+	maps.push_back(map2);
+	map3 = loadGameMap("data/map_02.map");
+	maps.push_back(map3);
+	map4 = loadGameMap("data/map_03.map");
+	maps.push_back(map4);
+
+	std::cout << map1 << std::endl;
+	std::cout << map2 << std::endl;
+	std::cout << map3 << std::endl;
+	std::cout << map4 << std::endl;
+
+	/*std::string s;
 	readFile("data/levels_db.txt", s);
 	std::istringstream f(s);
 	while (std::getline(f, s)) {
 		const char * c = s.c_str();
-		std::cout << c << std::endl;
 		map = loadGameMap(c);
 		maps.push_back(map);
-	}
+
+	}*/
 }
 void World::loadWorld() {
 	//constants
