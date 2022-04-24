@@ -91,36 +91,87 @@ Vector2 computeCamera(Vector2 playerPos, Vector2 playerToCam, int w, int h) {
 }
 
 bool isTotem(Vector2 worldPos, Vector2 totemPos) {
-	Vector2i playerCell = WorldToCell(worldPos, cellSize);
-	Vector2i totemCell = WorldToCell(totemPos, cellSize);
-	return  playerCell == totemCell;
+
+	float distance = worldPos.distance(totemPos);
+	float maxDistance = 6.0f;
+
+	return  distance <= maxDistance;
 }
 
 void totemLogic(Sprite* totem, sPlayer* player) {
-	Vector2i totemCell = WorldToCell(totem->position, cellSize);
-	Vector2i playerCell = WorldToCell(player->position, cellSize);
+	/*Vector2i totemCell = WorldToCell(totem->position, cellSize);
+	Vector2i playerCell = WorldToCell(player->position, cellSize);*/
 
+	Vector2 movement;
+	float totemSpeed = (float)cellSize;
+	//float knockback = 3.0f;
 
-	if (playerCell.x < totemCell.x && player->dir == RIGHT) {
+	if (player->position.x < totem->position.x && player->dir == RIGHT) {
 		
-		totemCell.x += 1;
+		movement.x += totemSpeed;
+		//player->position.x -= knockback;
 	}
-	if (playerCell.x >= totemCell.x && player->dir == LEFT) {
+	if (player->position.x >= totem->position.x && player->dir == LEFT) {
 
-		totemCell.x -= 1;
+		movement.x -= totemSpeed;
+		//player->position.x += knockback;
 	}
-	if (playerCell.y < totemCell.y && player->dir == DOWN) {
+	if (player->position.y < totem->position.y && player->dir == DOWN) {
 
-		totemCell.y += 1;
+		movement.y += totemSpeed;
+		//player->position.y -= knockback;
 	}
-	if (playerCell.y >= totemCell.y && player->dir == UP) {
-		totemCell.y -= 1;
+	if (player->position.x >= totem->position.x && player->dir == UP) {
+		movement.y -= totemSpeed;
+		//player->position.y += knockback;
 	}
+	Vector2 target = totem->position + movement;
+	totem->target = target;
 
-	totem->position = CellToWorld(totemCell,cellSize);
-	//int distance = playerCell.distance(totemCell);
-	//std::cout << distance << std::endl;
+	//totem->position = CellToWorld(totemCell,cellSize);
 }
+
+void openDoor(Sprite* totem, GameMap* map) {
+	Vector2i totemCell = WorldToCell(totem->position, cellSize);
+
+	if (map->getCell(totemCell.x, totemCell.y).type == 10) {
+		std::cout << "win" << std::endl;
+	}
+}
+
+void callTotem(Sprite* totem, sPlayer* player) {
+	//codigo repetido
+	float distance = player->position.distance(totem->position);
+	float maxDistance = 20.0f;
+	if (distance < maxDistance) {
+		Vector2 movement;
+		float totemSpeed = abs(distance - 10.0f);
+
+		if (player->position.x < totem->position.x && player->dir == RIGHT) {
+
+			movement.x -= totemSpeed;
+		}
+		if (player->position.x >= totem->position.x && player->dir == LEFT) {
+
+			movement.x += totemSpeed;
+		}
+		if (player->position.y < totem->position.y && player->dir == DOWN) {
+
+			movement.y -= totemSpeed;
+		}
+		if (player->position.x >= totem->position.x && player->dir == UP) {
+			movement.y += totemSpeed;
+		}
+		Vector2 target = totem->position + movement;
+		totem->target = target;
+	}
+}
+
+bool isWin(Vector2 worldPos, GameMap* map) {
+	Vector2i playerCell = WorldToCell(worldPos, cellSize);
+
+	return playerCell == map->winPoint;
+};
 
 bool isValid(Vector2 worldPos, GameMap* map) { //mejorable
 	Vector2i cellCoord = WorldToCell(worldPos, cellSize);
@@ -136,17 +187,12 @@ bool isValid(Vector2 worldPos, GameMap* map) { //mejorable
 
 };
 
-void openDoor(Sprite* totem, GameMap* map) {
-	Vector2i totemCell = WorldToCell(totem->position, cellSize);
-	
-	if (map->getCell(totemCell.x, totemCell.y).type == 10) {
-		std::cout << "win" << std::endl;
-	}
-}
 
-float EaseInOutSine(float a, float b, float t) {
+Vector2 EaseInOutSine(Vector2 a, Vector2 b, float t) {
 	float n = -(cos(PI*t) - 1.0f) / 2.0f;
-	return n * (b - a);
+
+	return Vector2(n*(b.x - a.x), n*(b.y - a.y));
+
 	/*usage example
 	float lerpTime = 3.0f;
 	float t = fmod(time,lerpTime) /lerTime;
@@ -155,9 +201,10 @@ float EaseInOutSine(float a, float b, float t) {
 	float easedT = EaseInOutSine(min,max,t);
 
 	framebuffer.setPixel(min+easedT,10, Color::CYAN);
-	
 	*/
+	
 }
+
 
 void sPlayer::renderPlayer( Image* framebuffer, float time, Image sprite, Vector2 camOffset) {
 
@@ -171,7 +218,8 @@ void sPlayer::renderPlayer( Image* framebuffer, float time, Image sprite, Vector
 };
 
 void renderSprite(Image* framebuffer, Sprite sprite, Vector2 camOffset) {
-	framebuffer->drawImage(sprite.sprite, sprite.position.x-camOffset.x, sprite.position.y-camOffset.y);
+	Vector2 spriteRender = sprite.position - camOffset;
+	framebuffer->drawImage(sprite.sprite, spriteRender.x - sprite.spriteWidth/2, spriteRender.y - sprite.spriteHeight / 2);
 }
 
 int synthMusic::notesLength() {
@@ -194,7 +242,7 @@ void InitMaps(std::vector<GameMap*>& maps) {
 	GameMap* map;
 	TextParser tp;
 	if (tp.create("data/levels_db.txt") == false)
-		std::cout << "unknown: " << "file not found" << std::endl;
+		std::cout << "database file not found" << std::endl;
 
 	//while there are words to read
 	char* w;
@@ -226,5 +274,15 @@ void World::loadWorld() {
 	tileset.loadTGA("data/tileset.tga");
 	InitMaps(maps);
 	InitStages(stages);
+
+	//init position on map 0 //hardcoded
+	Vector2 playerPos = CellToWorld(maps[0]->spawnPoint, cellSize);
+	Vector2 totemPos = CellToWorld(maps[0]->totemPoint, cellSize);
+
+	player.position = playerPos;
+	player.target = playerPos;
+
+	totem.position = totemPos;
+	totem.target = totemPos;
 
 }

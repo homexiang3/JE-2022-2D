@@ -39,8 +39,10 @@ public:
 	int width;
 	int height;
 
-	//Vector2i spawnPoint;
-	//std::vector<Vector2i> enemySpawnPoints;
+	Vector2i spawnPoint = Vector2i(8,8);
+	Vector2i totemPoint = Vector2i(11, 11);
+	Vector2i winPoint = Vector2i(12, 12);
+	std::vector<Vector2i> enemySpawnPoints;
 
 	sCell* data;
 
@@ -68,7 +70,7 @@ GameMap* loadGameMap(const char* filename);
 void renderGameMap(Image& framebuffer, Image tileset, GameMap* map, Vector2 camOffset);
 
 
-float EaseInOutSine(float a, float b, float t);
+Vector2 EaseInOutSine(Vector2 a, Vector2 b, float t);
 
 //CAMERA
 Vector2 computeCamera(Vector2 playerPos, Vector2 playerToCam, int w, int h);
@@ -84,7 +86,9 @@ enum PLAYER_DIR {
 
 class sPlayer {
 public:
-	Vector2 position = Vector2(60,60);
+	Vector2 position;
+	Vector2 target;
+	float lerpTime = 3.0f;
 	bool isMoving = false;
 	PLAYER_DIR dir = DOWN;
 	bool isDead = false;
@@ -99,7 +103,9 @@ public:
 };
 
 struct Sprite {
-	Vector2 position = Vector2(90, 90);
+	Vector2 position;
+	Vector2 target;
+	float lerpTime = 3.0f;
 	Image sprite;
 	int spriteWidth = 8;
 	int spriteHeight = 12;
@@ -160,5 +166,7 @@ bool isValid(Vector2 worldPos, GameMap* map);
 bool isTotem(Vector2 worldPos, Vector2 totemPos);
 void totemLogic(Sprite* totem, sPlayer* player);
 void openDoor(Sprite* totem, GameMap* map);
+void callTotem(Sprite* totem, sPlayer* player);
+bool isWin(Vector2 worldPos, GameMap* map);
 
 #endif

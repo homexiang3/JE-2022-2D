@@ -67,6 +67,19 @@ void PlayStage::Render(Image& framebuffer) {
 	//render map
 	renderGameMap(framebuffer, game->world.tileset, GetCurrentMap(game->world.player.currentMap, game->world.maps), game->world.camOffset);
 	//render enemies/totems
+	game->world.player.position = game->world.player.target;
+
+	//lerp?
+	float lerpTime = 1.0f;
+	float t = fmod(game->time, lerpTime) / lerpTime;
+	Vector2 min = game->world.totem.position;
+	Vector2 max = game->world.totem.target;
+	Vector2 easedT = EaseInOutSine(min, max, t);
+
+	game->world.totem.position += easedT;
+
+	//std::cout << easedT.x << " " << easedT.y << std::endl;
+
 	renderSprite(&framebuffer, game->world.totem, game->world.camOffset);
 	//render player
 	game->world.player.renderPlayer( &framebuffer, game->time, game->world.sprite, game->world.camOffset);
@@ -100,28 +113,35 @@ void PlayStage::Update(float seconds_elapsed) {
 		movement.x -= player->moveSpeed;
 		player->dir = PLAYER_DIR::LEFT;
 	}
+	//win condition
+
+	if (isWin(player->position, GetCurrentMap(game->world.player.currentMap, game->world.maps))) {
+
+			int nextMapIndex = (player->currentMap + 1) % game->world.maps.size();
+			SetMap(nextMapIndex, player->currentMap);
+		
+	};
 	//collisions
 	Vector2 target = player->position + movement * seconds_elapsed;
-	Vector2 oldPlayerPos = player->position;
 
 	if (isTotem(target, totem->position)) {
 		totemLogic(totem, player);
 		openDoor(totem, GetCurrentMap(game->world.player.currentMap, game->world.maps));
 	}
 
-	if (isValid(target, GetCurrentMap(game->world.player.currentMap, game->world.maps))) {
-		player->position = target;	
+	else if (isValid(target, GetCurrentMap(game->world.player.currentMap, game->world.maps))) {
+		player->target = target;	
 	}
 	else if (isValid(Vector2(target.x,player->position.y), GetCurrentMap(game->world.player.currentMap, game->world.maps))) {
-		player->position = Vector2(target.x, player->position.y);
+		player->target = Vector2(target.x, player->position.y);
 	}
 	else if (isValid(Vector2(player->position.x, target.y), GetCurrentMap(game->world.player.currentMap, game->world.maps))) {
-		player->position = Vector2(player->position.x, target.y);
+		player->target = Vector2(player->position.x, target.y);
 	}
 	//update movement
 	  //player->position += movement * seconds_elapsed;
-		player->isMoving = oldPlayerPos.x != player->position.x || oldPlayerPos.y != player->position.y;
-	//oscilator example
+		player->isMoving = player->position.x != player->target.x || player->position.y != player->target.y;
+	//oscilator
 	    Game::instance->world.music.playMelody();
 
 
@@ -132,6 +152,11 @@ void PlayStage::Update(float seconds_elapsed) {
 		//debug to change maps
 		int nextMapIndex = (player->currentMap + 1) % game->world.maps.size();
 		SetMap(nextMapIndex, player->currentMap);
+	}
+	if (Input::wasKeyPressed(SDL_SCANCODE_X))
+	{
+		//attract totem to player
+		callTotem(totem, player);
 	}
 
 	/*to read the gamepad state
