@@ -2,6 +2,7 @@
 #include "utils.h"
 #include "image.h"
 #include "world.h"
+#include "textparser.h"
 
 const int cellSize = 8;
 
@@ -190,34 +191,21 @@ void SetMap(int id, int &currentMap) { currentMap = id; };
 
 void InitMaps(std::vector<GameMap*>& maps) {
 
-	GameMap* map1;
-	GameMap* map2;
-	GameMap* map3;
-	GameMap* map4;
+	GameMap* map;
+	TextParser tp;
+	if (tp.create("data/levels_db.txt") == false)
+		std::cout << "unknown: " << "file not found" << std::endl;
 
-	map1 = loadGameMap("data/map_00.map");
-	maps.push_back(map1);
-	map2 = loadGameMap("data/map_01.map");
-	maps.push_back(map2);
-	map3 = loadGameMap("data/map_02.map");
-	maps.push_back(map3);
-	map4 = loadGameMap("data/map_03.map");
-	maps.push_back(map4);
-
-	std::cout << map1 << std::endl;
-	std::cout << map2 << std::endl;
-	std::cout << map3 << std::endl;
-	std::cout << map4 << std::endl;
-
-	/*std::string s;
-	readFile("data/levels_db.txt", s);
-	std::istringstream f(s);
-	while (std::getline(f, s)) {
-		const char * c = s.c_str();
-		map = loadGameMap(c);
+	//while there are words to read
+	char* w;
+	while (w = tp.getword()) //returns null at end
+	{
+		map = loadGameMap(w);
 		maps.push_back(map);
+		tp.nextline();
 
-	}*/
+	}
+
 }
 void World::loadWorld() {
 	//constants

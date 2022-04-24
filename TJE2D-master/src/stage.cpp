@@ -129,6 +129,9 @@ void PlayStage::Update(float seconds_elapsed) {
 	if (Input::wasKeyPressed(SDL_SCANCODE_F)) //if key F was pressed example sound
 	{
 		Game::instance->synth.playSample("data/hit.wav", 1, false);
+		//debug to change maps
+		int nextMapIndex = (player->currentMap + 1) % game->world.maps.size();
+		SetMap(nextMapIndex, player->currentMap);
 	}
 
 	/*to read the gamepad state
