@@ -13,7 +13,9 @@ c:\users\home_\onedrive\documentos\github\je-2022-2d2\tje2d-master\src\image.h(7
 c:\users\home_\onedrive\documentos\github\je-2022-2d2\tje2d-master\src\image.h(104): warning C4018: '<': no coinciden signed/unsigned
 c:\users\home_\onedrive\documentos\github\je-2022-2d2\tje2d-master\src\image.h(105): warning C4018: '<': no coinciden signed/unsigned
 c:\users\home_\onedrive\documentos\github\je-2022-2d2\tje2d-master\src\input.h(81): warning C4800: 'int': forzando el valor a bool 'true' o 'false' (advertencia de rendimiento)
-c:\users\home_\onedrive\documentos\github\je-2022-2d2\tje2d-master\src\stage.cpp(118): warning C4018: '<': no coinciden signed/unsigned
+c:\users\home_\onedrive\documentos\github\je-2022-2d2\tje2d-master\src\stage.cpp(82): warning C4018: '<': no coinciden signed/unsigned
+c:\users\home_\onedrive\documentos\github\je-2022-2d2\tje2d-master\src\stage.cpp(125): warning C4018: '<': no coinciden signed/unsigned
+c:\users\home_\onedrive\documentos\github\je-2022-2d2\tje2d-master\src\stage.cpp(132): warning C4018: '<': no coinciden signed/unsigned
 framework.obj : warning LNK4075: se omite '/EDITANDCONTINUE' debido a la especificación '/OPT:LBR'
   visual.vcxproj -> C:\Users\home_\OneDrive\Documentos\GitHub\JE-2022-2D2\TJE2D-master\visual\visual\..\..\Game.exe
   visual.vcxproj -> ..\..\Game.pdb (Full PDB)

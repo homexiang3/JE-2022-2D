@@ -37,7 +37,14 @@ GameMap* loadGameMap(const char* filename)
 			case ENDCELL: map->winPoint = pos; break;
 			case DOOR: map->doorPoint = pos; break;
 			case MARK: map->markPoint = pos; break;
-			case ENEMY: map->enemySpawnPoints.push_back(pos); break;
+			case ENEMY: 
+			{
+			Sprite* enemy = &(Game::instance->world.enemy);
+			map->enemySpawnPoint.push_back(pos);
+			enemy->position = pos;
+			enemy->target = pos;
+			map->enemies.push_back(enemy); break; 
+			}
 			case TRAP: map->trapPoints.push_back(pos); break;
 			}
 		}
@@ -88,9 +95,10 @@ void loadLevel(GameMap* map, sPlayer* player, Sprite* totem) { //first time that
 	totem -> position = totemPos;
 	totem -> target = totemPos;
 
-	for (int i = 0; i < map->enemySpawnPoints.size(); i++)
+	for (int i = 0; i < map->enemies.size(); i++)
 	{
-
+		Vector2 position = CellToWorld(map->enemySpawnPoint[i], cellSize);
+		map->enemies[i]->position = position;
 	}
 };
 
@@ -128,11 +136,48 @@ bool isTotem(Vector2 worldPos, Vector2 totemPos) {
 
 	return  distance <= maxDistance;
 }
+
+bool isEnemy(Vector2 worldPos, GameMap* layer) {
+	float distance;
+	float maxDistance = 5.0f;
+
+	for (int i = 0; i < layer->enemies.size(); i++) {
+		distance = worldPos.distance(layer->enemies[i]->position);
+			if (distance <= maxDistance) {
+				return true;
+			}
+	}
+	return  false;
+}
+
+void enemiesMovement(Sprite* enemy, sPlayer player, float seconds_elapsed) {
+
+	Vector2 movement;
+;
+
+	if (player.position.x < enemy->position.x ) {
+
+		movement.x -= enemy->moveSpeed;
+	}
+	if (player.position.x >= enemy->position.x ) {
+
+		movement.x += enemy->moveSpeed;
+	}
+	if (player.position.y < enemy->position.y ) {
+
+		movement.y -= enemy->moveSpeed;
+	}
+	if (player.position.x >= enemy->position.x) {
+		movement.y += enemy->moveSpeed;
+	}
+	Vector2 target = enemy->position + movement * seconds_elapsed/2;
+	enemy->position = target;
+}
 bool isDeath(Vector2 worldPos, GameMap* layer) {
 	Vector2i cellCoord = WorldToCell(worldPos, cellSize);
 
 	return layer->getCell(cellCoord.x, cellCoord.y).type == DEATH || layer->getCell(cellCoord.x, cellCoord.y).type == TRAP;
-};
+}
 
 Vector2 totemLogic(Sprite* totem, sPlayer* player) {
 
@@ -174,13 +219,10 @@ bool openDoor(Sprite* totem, GameMap* layer, GameMap* map) {
 	return false;
 }
 
-Vector2 callTotem(Sprite* totem, sPlayer* player) {
-	//codigo repetido
-	float distance = player->position.distance(totem->position);
-	float maxDistance = 20.0f;
-	if (distance < maxDistance) {
+Vector2 callTotem(Sprite* totem, sPlayer* player, float totemSpeed) {
+
 		Vector2 movement;
-		float totemSpeed = abs(distance - 10.0f);
+		
 
 		if (player->position.x < totem->position.x && player->dir == RIGHT) {
 
@@ -199,8 +241,7 @@ Vector2 callTotem(Sprite* totem, sPlayer* player) {
 		}
 		Vector2 target = totem->position + movement;
 		return target;
-	}
-	return totem->position;
+
 	
 }
 

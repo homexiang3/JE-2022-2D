@@ -62,7 +62,7 @@ void TutorialStage::Update(float seconds_elapsed) {
 
 void PlayStage::Render(Image& framebuffer) {
 	Game* game = Game::instance;
-	
+
 	//calculate camera
 	game->world.camOffset = computeCamera(game->world.player.position, game->world.playerToCam, game->framebuffer_width, game->framebuffer_height);
 	//render map
@@ -73,10 +73,20 @@ void PlayStage::Render(Image& framebuffer) {
 	//lerp?
 	lerp(&(game->world.totem), game->time);
 
+	//render totem
 	game->world.totem.Render(&framebuffer, game->time, game->world.camOffset);
 	//render player
-	game->world.player.Render( &framebuffer, game->time, game->world.camOffset);
-
+	game->world.player.Render(&framebuffer, game->time, game->world.camOffset);
+	//render enemies
+	GameMap* currentLayer = GetCurrentMap(game->world.player.currentMap, game->world.maps_layer);
+	for (int i = 0; i < currentLayer->enemies.size(); i++){
+		currentLayer->enemies[i]->Render(&framebuffer, game->time, game->world.camOffset);
+	}
+	//Attract available
+	if (game->world.player.attractAvailable) {
+		framebuffer.drawRectangle(135, 5, 20, 20, Color::GRAY);
+		framebuffer.drawText("X", 142.5, 10, Game::instance->world.font);
+	}
 	
 }
 
@@ -106,15 +116,19 @@ void PlayStage::Update(float seconds_elapsed) {
 		movement.x -= player->moveSpeed;
 		player->dir = PLAYER_DIR::LEFT;
 	}
+	//enemies movement
 	
 	Vector2 target = player->position + movement * seconds_elapsed;
 	GameMap* currentMap = GetCurrentMap(game->world.player.currentMap, game->world.maps);
 	GameMap* currentLayer = GetCurrentMap(game->world.player.currentMap, game->world.maps_layer);
 
+	for (int i = 0; i < currentLayer->enemies.size(); i++) {
+		enemiesMovement(currentLayer->enemies[i], game->world.player, seconds_elapsed);
+	}
+
 	//win condition
 	if (isWin(player->position, currentLayer)) {
 		int nextMapIndex = (player->currentMap + 1);
-		std::cout << nextMapIndex << std::endl;
 		if (nextMapIndex < game->world.maps.size()) {
 			SetMap(nextMapIndex, player->currentMap);
 			loadLevel(GetCurrentMap(game->world.player.currentMap, game->world.maps_layer), player, totem);
@@ -123,11 +137,12 @@ void PlayStage::Update(float seconds_elapsed) {
 			Game::instance->world.currentStage = END;
 		}
 	}
+	
 	//Death condition
-	else if (isDeath(target, currentLayer)) {
+	else if (isDeath(target, currentLayer) || isEnemy(target,currentLayer)) {
 		Game::instance->synth.playSample("data/die.wav", 1, false);
 		currentMap->getCell(currentLayer->doorPoint.x, currentLayer->doorPoint.y).type = (eCellType)11;
-		loadLevel(currentLayer, player, totem);
+		loadLevel(currentLayer, player, totem); 
 
 	}
 	else {
@@ -149,11 +164,25 @@ void PlayStage::Update(float seconds_elapsed) {
 		//oscilator
 		Game::instance->world.music.playMelody();
 
-		if (Input::wasKeyPressed(SDL_SCANCODE_X))
-		{
-			//attract totem to player
-			Vector2 targetTotem = callTotem(totem, player);
-			collisionLogic(targetTotem, currentLayer, totem);
+		//attract totem to player
+		float distance = player->position.distance(totem->position);
+		float maxDistance = 20.0f;
+		if (distance < maxDistance) {
+
+			player->attractAvailable = true;
+			if (Input::wasKeyPressed(SDL_SCANCODE_X))
+			{
+
+				float totemSpeed = abs(distance - 10.0f);
+				Vector2 targetTotem = callTotem(totem, player, totemSpeed);
+				Game::instance->synth.playSample("data/attract.wav", 1, false);
+				collisionLogic(targetTotem, currentLayer, totem);
+
+			}
+		
+		}
+		else {
+			player->attractAvailable = false;
 		}
 	};
 }

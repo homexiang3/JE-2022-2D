@@ -4,6 +4,46 @@
 #include "stage.h"
 #include "includes.h"
 
+//PLAYER FUNCTIONS
+
+enum PLAYER_DIR {
+	DOWN = 0,
+	RIGHT = 1,
+	LEFT = 2,
+	UP = 3
+};
+
+class Sprite {
+public:
+	Vector2 position;
+	Vector2 target;
+	float lerpTime = 2.0f;
+	Image sprite;
+	int spriteWidth = 8;
+	int spriteHeight = 12;
+	float moveSpeed = 8.0f;
+
+	virtual void Render(Image* framebuffer, float time, Vector2 camOffset);
+};
+class sPlayer :public Sprite {
+public:
+	Vector2 position;
+	Vector2 target;
+	float lerpTime = 2.0f;
+	Image sprite;
+	int spriteWidth = 14;
+	int spriteHeight = 18;
+	float moveSpeed = 50.0f;
+	//player different variables
+	bool isMoving = false;
+	PLAYER_DIR dir = DOWN;
+	bool attractAvailable = false;
+	int currentMap = 0;
+	float animSpeed = 4.0f;
+
+	void Render(Image* framebuffer, float time, Vector2 camOffset);
+};
+
 //MAP FUNCTIONS
 
 enum eCellType : uint8 {
@@ -48,7 +88,8 @@ public:
 	Vector2i doorPoint;
 	Vector2i totemPoint;
 	Vector2i winPoint;
-	std::vector<Vector2i> enemySpawnPoints;
+	std::vector<Sprite*> enemies;
+	std::vector<Vector2i> enemySpawnPoint;
 	std::vector<Vector2i> trapPoints;
 
 	sCell* data;
@@ -80,46 +121,6 @@ void renderGameMap(Image& framebuffer, Image tileset, GameMap* map, Vector2 camO
 
 //CAMERA
 Vector2 computeCamera(Vector2 playerPos, Vector2 playerToCam, int w, int h);
-
-//PLAYER FUNCTIONS
-
-enum PLAYER_DIR {
-	DOWN = 0,
-	RIGHT = 1,
-	LEFT = 2,
-	UP = 3
-};
-
-class Sprite {
-public:
-	Vector2 position;
-	Vector2 target;
-	float lerpTime = 2.0f;
-	Image sprite;
-	int spriteWidth = 8;
-	int spriteHeight = 12;
-	float moveSpeed = 8.0f;
-
-	virtual void Render(Image* framebuffer, float time, Vector2 camOffset);
-};
-class sPlayer:public Sprite {
-public:
-	Vector2 position;
-	Vector2 target;
-	float lerpTime = 2.0f;
-	Image sprite;
-	int spriteWidth = 14;
-	int spriteHeight = 18;
-	float moveSpeed = 50.0f;
-	//player different variables
-	bool isMoving = false;
-	PLAYER_DIR dir = DOWN;
-	bool isDead = false;
-	int currentMap = 0;
-	float animSpeed = 4.0f;
-
-	void Render(Image* framebuffer, float time, Vector2 camOffset);
-};
 
 
 //Music class
@@ -182,10 +183,12 @@ bool isValid(Vector2 worldPos, GameMap* map);
 bool isTotem(Vector2 worldPos, Vector2 totemPos);
 Vector2 totemLogic(Sprite* totem, sPlayer* player);
 bool openDoor(Sprite* totem, GameMap* layer, GameMap* map);
-Vector2 callTotem(Sprite* totem, sPlayer* player);
+Vector2 callTotem(Sprite* totem, sPlayer* player, float totemSpeed);
 bool isWin(Vector2 worldPos, GameMap* layer);
 bool isDeath(Vector2 worldPos, GameMap* layer);
 void collisionLogic(Vector2 target, GameMap* layer, sPlayer* object);
 void collisionLogic(Vector2 target, GameMap* layer, Sprite* object);
+bool isEnemy(Vector2 worldPos, GameMap* layer);
+void enemiesMovement(Sprite* enemy, sPlayer player, float seconds_elapsed);
 
 #endif
