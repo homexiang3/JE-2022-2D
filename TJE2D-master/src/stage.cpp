@@ -122,9 +122,9 @@ void PlayStage::Update(float seconds_elapsed) {
 		else {
 			Game::instance->world.currentStage = END;
 		}
-	};
+	}
 	//Death condition
-	if (isDeath(target, currentLayer)) {
+	else if (isDeath(target, currentLayer)) {
 		Game::instance->synth.playSample("data/die.wav", 1, false);
 		currentMap->getCell(currentLayer->doorPoint.x, currentLayer->doorPoint.y).type = (eCellType)11;
 		loadLevel(currentLayer, player, totem);
@@ -142,7 +142,7 @@ void PlayStage::Update(float seconds_elapsed) {
 		}
 		else {
 			collisionLogic(target, currentLayer, player);
-		};
+			};
 		//update movement
 		player->isMoving = player->position.x != player->target.x || player->position.y != player->target.y;
 
@@ -155,7 +155,7 @@ void PlayStage::Update(float seconds_elapsed) {
 			Vector2 targetTotem = callTotem(totem, player);
 			collisionLogic(targetTotem, currentLayer, totem);
 		}
-	}
+	};
 }
 
 //END STAGE

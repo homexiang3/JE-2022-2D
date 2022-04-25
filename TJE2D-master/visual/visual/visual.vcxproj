@@ -18,6 +18,7 @@
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\stage.cpp" />
     <ClCompile Include="..\..\src\synth.cpp" />
+    <ClCompile Include="..\..\src\textparser.cpp" />
     <ClCompile Include="..\..\src\utils.cpp" />
     <ClCompile Include="..\..\src\world.cpp" />
   </ItemGroup>
@@ -29,6 +30,7 @@
     <ClInclude Include="..\..\src\input.h" />
     <ClInclude Include="..\..\src\stage.h" />
     <ClInclude Include="..\..\src\synth.h" />
+    <ClInclude Include="..\..\src\textparser.h" />
     <ClInclude Include="..\..\src\utils.h" />
     <ClInclude Include="..\..\src\world.h" />
   </ItemGroup>

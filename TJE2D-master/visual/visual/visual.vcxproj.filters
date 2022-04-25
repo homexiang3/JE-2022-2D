@@ -14,6 +14,9 @@
     <ClCompile Include="..\..\src\world.cpp">
       <Filter>myGame</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\textparser.cpp">
+      <Filter>myGame</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\framework.h" />
@@ -27,6 +30,9 @@
       <Filter>myGame</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\world.h">
+      <Filter>myGame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\textparser.h">
       <Filter>myGame</Filter>
     </ClInclude>
   </ItemGroup>

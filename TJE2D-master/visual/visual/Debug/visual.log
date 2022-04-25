@@ -1,10 +1,19 @@
 ﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(368,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
-  world.cpp
+  stage.cpp
+c:\users\home_\onedrive\documentos\github\je-2022-2d2\tje2d-master\src\framework.h(257): warning C4244: 'argumento': conversión de 'int' a 'float'; posible pérdida de datos
+c:\users\home_\onedrive\documentos\github\je-2022-2d2\tje2d-master\src\framework.h(259): warning C4244: 'argumento': conversión de 'float' a 'unsigned char'; posible pérdida de datos
+c:\users\home_\onedrive\documentos\github\je-2022-2d2\tje2d-master\src\framework.h(275): warning C4244: 'inicializando': conversión de 'double' a 'float'; posible pérdida de datos
+c:\users\home_\onedrive\documentos\github\je-2022-2d2\tje2d-master\src\framework.h(278): warning C4244: 'argumento': conversión de 'double' a 'unsigned char'; posible pérdida de datos
+c:\users\home_\onedrive\documentos\github\je-2022-2d2\tje2d-master\src\image.h(53): warning C4244: 'argumento': conversión de 'unsigned int' a 'float'; posible pérdida de datos
+c:\users\home_\onedrive\documentos\github\je-2022-2d2\tje2d-master\src\image.h(53): warning C4244: '=': conversión de 'float' a 'unsigned int'; posible pérdida de datos
+c:\users\home_\onedrive\documentos\github\je-2022-2d2\tje2d-master\src\image.h(54): warning C4244: 'argumento': conversión de 'unsigned int' a 'float'; posible pérdida de datos
+c:\users\home_\onedrive\documentos\github\je-2022-2d2\tje2d-master\src\image.h(54): warning C4244: '=': conversión de 'float' a 'unsigned int'; posible pérdida de datos
 c:\users\home_\onedrive\documentos\github\je-2022-2d2\tje2d-master\src\image.h(61): warning C4018: '>=': no coinciden signed/unsigned
+c:\users\home_\onedrive\documentos\github\je-2022-2d2\tje2d-master\src\image.h(74): warning C4244: 'argumento': conversión de 'float' a 'int'; posible pérdida de datos
 c:\users\home_\onedrive\documentos\github\je-2022-2d2\tje2d-master\src\image.h(104): warning C4018: '<': no coinciden signed/unsigned
 c:\users\home_\onedrive\documentos\github\je-2022-2d2\tje2d-master\src\image.h(105): warning C4018: '<': no coinciden signed/unsigned
-c:\users\home_\onedrive\documentos\github\je-2022-2d2\tje2d-master\src\world.cpp(55): warning C4018: '>': no coinciden signed/unsigned
-c:\users\home_\onedrive\documentos\github\je-2022-2d2\tje2d-master\src\world.cpp(56): warning C4018: '>': no coinciden signed/unsigned
+c:\users\home_\onedrive\documentos\github\je-2022-2d2\tje2d-master\src\input.h(81): warning C4800: 'int': forzando el valor a bool 'true' o 'false' (advertencia de rendimiento)
+c:\users\home_\onedrive\documentos\github\je-2022-2d2\tje2d-master\src\stage.cpp(118): warning C4018: '<': no coinciden signed/unsigned
 framework.obj : warning LNK4075: se omite '/EDITANDCONTINUE' debido a la especificación '/OPT:LBR'
   visual.vcxproj -> C:\Users\home_\OneDrive\Documentos\GitHub\JE-2022-2D2\TJE2D-master\visual\visual\..\..\Game.exe
   visual.vcxproj -> ..\..\Game.pdb (Full PDB)
