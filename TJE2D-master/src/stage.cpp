@@ -70,19 +70,13 @@ void PlayStage::Render(Image& framebuffer) {
 	game->world.player.position = game->world.player.target;
 
 	//lerp?
-	float lerpTime = 1.0f;
-	float t = fmod(game->time, lerpTime) / lerpTime;
-	Vector2 min = game->world.totem.position;
-	Vector2 max = game->world.totem.target;
-	Vector2 easedT = EaseInOutSine(min, max, t);
-
-	game->world.totem.position += easedT;
-
+	lerp(&(game->world.totem), game->time);
+	//lerp(&(game->world.player), game->time);
 	//std::cout << easedT.x << " " << easedT.y << std::endl;
 
-	renderSprite(&framebuffer, game->world.totem, game->world.camOffset);
+	game->world.totem.Render(&framebuffer, game->time, game->world.camOffset);
 	//render player
-	game->world.player.renderPlayer( &framebuffer, game->time, game->world.sprite, game->world.camOffset);
+	game->world.player.Render( &framebuffer, game->time, game->world.camOffset);
 
 	
 }
@@ -117,8 +111,13 @@ void PlayStage::Update(float seconds_elapsed) {
 
 	if (isWin(player->position, GetCurrentMap(game->world.player.currentMap, game->world.maps))) {
 
-			int nextMapIndex = (player->currentMap + 1) % game->world.maps.size();
-			SetMap(nextMapIndex, player->currentMap);
+			int nextMapIndex = (player->currentMap + 1);
+			if (nextMapIndex < game->world.maps.size()) {
+				SetMap(nextMapIndex, player->currentMap);
+			}
+			else {
+				Game::instance->world.currentStage = END;
+			}
 		
 	};
 	//collisions

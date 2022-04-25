@@ -63,6 +63,10 @@ void renderGameMap(Image& framebuffer, Image tileset, GameMap* map, Vector2 camO
 		}
 };
 
+void loadLevel(GameMap* map) { //first time that enter o restart level...
+
+};
+
 
 Vector2i WorldToCell(Vector2 worldPos, int cellsize) {
 	return worldPos / cellsize;
@@ -205,21 +209,31 @@ Vector2 EaseInOutSine(Vector2 a, Vector2 b, float t) {
 	
 }
 
+void lerp(Sprite* object, float time) {
+	float lerpTime = object->lerpTime;
+	float t = fmod(time, lerpTime) / lerpTime;
+	Vector2 min = object->position;
+	Vector2 max = object->target;
+	Vector2 easedT = EaseInOutSine(min, max, t);
 
-void sPlayer::renderPlayer( Image* framebuffer, float time, Image sprite, Vector2 camOffset) {
+	object->position += easedT;
+};
+
+
+void sPlayer::Render( Image* framebuffer, float time, Vector2 camOffset) {
 
 	int start_x = (int(time * this->animSpeed) % 4) * this->spriteWidth;
 	start_x = this->isMoving ? start_x : 0;
 	int start_y = (int)this->dir * this->spriteHeight;
 	Vector2 playerRender = this->position - camOffset;
-	framebuffer->drawImage(sprite, playerRender.x - this->spriteWidth/2 ,playerRender.y - this->spriteHeight/1.2, Area(start_x, start_y, this->spriteWidth, this->spriteHeight));
+	framebuffer->drawImage(this->sprite, playerRender.x - this->spriteWidth/2 ,playerRender.y - this->spriteHeight/1.2, Area(start_x, start_y, this->spriteWidth, this->spriteHeight));
 	
 
 };
 
-void renderSprite(Image* framebuffer, Sprite sprite, Vector2 camOffset) {
-	Vector2 spriteRender = sprite.position - camOffset;
-	framebuffer->drawImage(sprite.sprite, spriteRender.x - sprite.spriteWidth/2, spriteRender.y - sprite.spriteHeight / 2);
+void Sprite::Render(Image* framebuffer, float time, Vector2 camOffset) {
+	Vector2 spriteRender = this->position - camOffset;
+	framebuffer->drawImage(this->sprite, spriteRender.x - this->spriteWidth/2, spriteRender.y - this->spriteHeight / 2);
 }
 
 int synthMusic::notesLength() {
@@ -261,8 +275,10 @@ void World::loadWorld() {
 	//load sprites
 	font.loadTGA("data/bitmap-font-white.tga"); //load bitmap-font image
 	minifont.loadTGA("data/mini-font-white-4x6.tga"); //load bitmap-font image
-	sprite.loadTGA("data/astronaut.tga"); //example to load an sprite
+	player.sprite.loadTGA("data/astronaut.tga"); //example to load an sprite
 	intro.loadTGA("data/intro.tga");
+	//tutorial.loadTGA("data/tutorial.tga");
+	//end.loadTGA("data/end.tga");
 	totem.sprite.loadTGA("data/totem.tga");
 
 	//read file example

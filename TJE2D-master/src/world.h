@@ -68,9 +68,8 @@ public:
 
 GameMap* loadGameMap(const char* filename);
 void renderGameMap(Image& framebuffer, Image tileset, GameMap* map, Vector2 camOffset);
+void loadLevel(GameMap* map);
 
-
-Vector2 EaseInOutSine(Vector2 a, Vector2 b, float t);
 
 //CAMERA
 Vector2 computeCamera(Vector2 playerPos, Vector2 playerToCam, int w, int h);
@@ -84,34 +83,40 @@ enum PLAYER_DIR {
 	UP = 3
 };
 
-class sPlayer {
+class Sprite {
 public:
 	Vector2 position;
 	Vector2 target;
-	float lerpTime = 3.0f;
+	float lerpTime = 2.0f;
+	Image sprite;
+	int spriteWidth = 8;
+	int spriteHeight = 12;
+	float moveSpeed = 8.0f;
+
+	virtual void Render(Image* framebuffer, float time, Vector2 camOffset);
+};
+class sPlayer:public Sprite {
+public:
+	Vector2 position;
+	Vector2 target;
+	float lerpTime = 2.0f;
+	Image sprite;
+	int spriteWidth = 14;
+	int spriteHeight = 18;
+	float moveSpeed = 50.0f;
+	//player different variables
 	bool isMoving = false;
 	PLAYER_DIR dir = DOWN;
 	bool isDead = false;
 	int currentMap = 0;
-	//prev constants of game
-	float moveSpeed = 50.0f;
 	float animSpeed = 4.0f;
-	int spriteWidth = 14;
-	int spriteHeight = 18;
 
-	void renderPlayer( Image* framebuffer, float time, Image sprite, Vector2 camOffset);
+	void Render(Image* framebuffer, float time, Vector2 camOffset);
 };
 
-struct Sprite {
-	Vector2 position;
-	Vector2 target;
-	float lerpTime = 3.0f;
-	Image sprite;
-	int spriteWidth = 8;
-	int spriteHeight = 12;
-};
+Vector2 EaseInOutSine(Vector2 a, Vector2 b, float t);
+void lerp(Sprite* object, float time);
 
-void renderSprite(Image* framebuffer, Sprite sprite, Vector2 camOffset);
 
 //Music class
 
@@ -131,8 +136,9 @@ class World {
 public:
 	Image font;
 	Image minifont;
-	Image sprite;
 	Image intro;
+	Image tutorial;
+	Image end;
 	Sprite totem;
 	//Color bgcolor(130, 80, 100);
 	//added player from world.h
