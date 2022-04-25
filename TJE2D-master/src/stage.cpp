@@ -184,6 +184,15 @@ void PlayStage::Update(float seconds_elapsed) {
 		else {
 			player->attractAvailable = false;
 		}
+		//debug levels
+		if (Input::wasKeyPressed(SDL_SCANCODE_Z))
+		{
+
+			int nextMapIndex = (player->currentMap + 1) % game->world.maps_layer.size();
+			SetMap(nextMapIndex, player->currentMap);
+			loadLevel(GetCurrentMap(game->world.player.currentMap, game->world.maps_layer), player, totem);
+
+		}
 	};
 }
 
