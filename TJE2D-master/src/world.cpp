@@ -134,7 +134,7 @@ bool isDeath(Vector2 worldPos, GameMap* layer) {
 	return layer->getCell(cellCoord.x, cellCoord.y).type == DEATH || layer->getCell(cellCoord.x, cellCoord.y).type == TRAP;
 };
 
-void totemLogic(Sprite* totem, sPlayer* player) {
+Vector2 totemLogic(Sprite* totem, sPlayer* player) {
 
 	Vector2 movement;
 	float totemSpeed = (float)cellSize;
@@ -155,7 +155,7 @@ void totemLogic(Sprite* totem, sPlayer* player) {
 		movement.y -= totemSpeed;
 	}
 	Vector2 target = totem->position + movement;
-	totem->target = target;
+	return target;
 
 
 }
@@ -174,7 +174,7 @@ bool openDoor(Sprite* totem, GameMap* layer, GameMap* map) {
 	return false;
 }
 
-void callTotem(Sprite* totem, sPlayer* player) {
+Vector2 callTotem(Sprite* totem, sPlayer* player) {
 	//codigo repetido
 	float distance = player->position.distance(totem->position);
 	float maxDistance = 20.0f;
@@ -198,8 +198,10 @@ void callTotem(Sprite* totem, sPlayer* player) {
 			movement.y += totemSpeed;
 		}
 		Vector2 target = totem->position + movement;
-		totem->target = target;
+		return target;
 	}
+	return totem->position;
+	
 }
 
 bool isWin(Vector2 worldPos, GameMap* map) {

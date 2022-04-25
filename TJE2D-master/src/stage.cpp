@@ -113,7 +113,6 @@ void PlayStage::Update(float seconds_elapsed) {
 
 	//win condition
 	if (isWin(player->position, currentLayer)) {
-
 		int nextMapIndex = (player->currentMap + 1);
 		std::cout << nextMapIndex << std::endl;
 		if (nextMapIndex < game->world.maps.size()) {
@@ -123,7 +122,6 @@ void PlayStage::Update(float seconds_elapsed) {
 		else {
 			Game::instance->world.currentStage = END;
 		}
-
 	};
 	//Death condition
 	if (isDeath(target, currentLayer)) {
@@ -135,8 +133,9 @@ void PlayStage::Update(float seconds_elapsed) {
 	else {
 		//collisions
 		if (isTotem(target, totem->position)) {
-			totemLogic(totem, player);
 			Game::instance->synth.playSample("data/hit.wav", 1, false);
+			Vector2 targetTotem = totemLogic(totem, player);
+			collisionLogic(targetTotem, currentLayer, totem);
 			if (openDoor(totem, currentLayer, currentMap)){
 				Game::instance->synth.playSample("data/win.wav", 1, false);
 			};
@@ -153,7 +152,8 @@ void PlayStage::Update(float seconds_elapsed) {
 		if (Input::wasKeyPressed(SDL_SCANCODE_X))
 		{
 			//attract totem to player
-			callTotem(totem, player);
+			Vector2 targetTotem = callTotem(totem, player);
+			collisionLogic(targetTotem, currentLayer, totem);
 		}
 	}
 }

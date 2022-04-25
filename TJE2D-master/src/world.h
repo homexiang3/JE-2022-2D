@@ -121,9 +121,6 @@ public:
 	void Render(Image* framebuffer, float time, Vector2 camOffset);
 };
 
-Vector2 EaseInOutSine(Vector2 a, Vector2 b, float t);
-void lerp(Sprite* object, float time);
-void loadLevel(GameMap* map, sPlayer* player, Sprite* totem);
 
 //Music class
 
@@ -166,22 +163,26 @@ public:
 	void loadWorld();
 
 };
+//Util functions
 
 GameMap* GetMap(int id, std::vector<GameMap*> &maps);
 GameMap* GetCurrentMap(int currentMap, std::vector<GameMap*> &maps);
 void SetMap(int id, int &currentMap);
 void InitMaps(std::vector<GameMap*> &maps, char* filename);
 
-//We assume maps always starts at (0,0)
+Vector2 EaseInOutSine(Vector2 a, Vector2 b, float t);
+void lerp(Sprite* object, float time);
+void loadLevel(GameMap* map, sPlayer* player, Sprite* totem);
+
 Vector2i WorldToCell(Vector2 worldPos, int cellsize);
 Vector2 CellToWorld(Vector2i cellPos, int cellsize);
 Vector2 CellToWorldCenter(Vector2i cellPos, int cellsize);
 
 bool isValid(Vector2 worldPos, GameMap* map);
 bool isTotem(Vector2 worldPos, Vector2 totemPos);
-void totemLogic(Sprite* totem, sPlayer* player);
+Vector2 totemLogic(Sprite* totem, sPlayer* player);
 bool openDoor(Sprite* totem, GameMap* layer, GameMap* map);
-void callTotem(Sprite* totem, sPlayer* player);
+Vector2 callTotem(Sprite* totem, sPlayer* player);
 bool isWin(Vector2 worldPos, GameMap* layer);
 bool isDeath(Vector2 worldPos, GameMap* layer);
 void collisionLogic(Vector2 target, GameMap* layer, sPlayer* object);
