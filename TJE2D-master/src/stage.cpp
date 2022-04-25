@@ -193,6 +193,9 @@ void EndStage::Render(Image& framebuffer) {
 	Game::instance->synth.osc1.amplitude = 0;
 	framebuffer.drawImage(Game::instance->world.end, 0, 0);
 	framebuffer.drawText("YOU WIN", 50, 10, Game::instance->world.font);
+	if (int(Game::instance->time) % 2 == 0) {
+		framebuffer.drawText("Press F to restart or ESC to close", 10, 110, Game::instance->world.minifont, 4, 6);
+	}
 }
 
 void EndStage::Update(float seconds_elapsed) {
