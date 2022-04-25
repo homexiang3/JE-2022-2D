@@ -26,8 +26,21 @@ GameMap* loadGameMap(const char* filename)
 	GameMap* map = new GameMap(header.w, header.h);
 
 	for (int x = 0; x < map->width; x++)
-		for (int y = 0; y < map->height; y++)
+		for (int y = 0; y < map->height; y++) {
 			map->getCell(x, y).type = (eCellType)cells[x + y * map->width];
+			//take layer values
+			sCell& cell = map->getCell(x, y);
+			Vector2i pos = Vector2i(x, y);
+			switch (cell.type) {
+			case START: map->spawnPoint = pos; break;
+			case TOTEM: map->totemPoint = pos; break;
+			case ENDCELL: map->winPoint = pos; break;
+			case DOOR: map->doorPoint = pos; break;
+			case MARK: map->markPoint = pos; break;
+			case ENEMY: map->enemySpawnPoints.push_back(pos); break;
+			case TRAP: map->trapPoints.push_back(pos); break;
+			}
+		}
 
 	delete[] cells; //always free any memory allocated!
 
@@ -63,8 +76,22 @@ void renderGameMap(Image& framebuffer, Image tileset, GameMap* map, Vector2 camO
 		}
 };
 
-void loadLevel(GameMap* map) { //first time that enter o restart level...
+void loadLevel(GameMap* map, sPlayer* player, Sprite* totem) { //first time that enter o restart level...
+	
+	map->opened = false;
 
+	Vector2 playerPos = CellToWorld(map->spawnPoint, cellSize);
+	Vector2 totemPos = CellToWorld(map->totemPoint, cellSize);
+	player -> position = playerPos;
+	player -> target = playerPos;
+
+	totem -> position = totemPos;
+	totem -> target = totemPos;
+
+	for (int i = 0; i < map->enemySpawnPoints.size(); i++)
+	{
+
+	}
 };
 
 
@@ -101,46 +128,48 @@ bool isTotem(Vector2 worldPos, Vector2 totemPos) {
 
 	return  distance <= maxDistance;
 }
+bool isDeath(Vector2 worldPos, GameMap* layer) {
+	Vector2i cellCoord = WorldToCell(worldPos, cellSize);
+
+	return layer->getCell(cellCoord.x, cellCoord.y).type == DEATH || layer->getCell(cellCoord.x, cellCoord.y).type == TRAP;
+};
 
 void totemLogic(Sprite* totem, sPlayer* player) {
-	/*Vector2i totemCell = WorldToCell(totem->position, cellSize);
-	Vector2i playerCell = WorldToCell(player->position, cellSize);*/
 
 	Vector2 movement;
 	float totemSpeed = (float)cellSize;
-	//float knockback = 3.0f;
 
 	if (player->position.x < totem->position.x && player->dir == RIGHT) {
 		
 		movement.x += totemSpeed;
-		//player->position.x -= knockback;
 	}
 	if (player->position.x >= totem->position.x && player->dir == LEFT) {
 
 		movement.x -= totemSpeed;
-		//player->position.x += knockback;
 	}
 	if (player->position.y < totem->position.y && player->dir == DOWN) {
 
 		movement.y += totemSpeed;
-		//player->position.y -= knockback;
 	}
 	if (player->position.x >= totem->position.x && player->dir == UP) {
 		movement.y -= totemSpeed;
-		//player->position.y += knockback;
 	}
 	Vector2 target = totem->position + movement;
 	totem->target = target;
 
-	//totem->position = CellToWorld(totemCell,cellSize);
+
 }
 
-void openDoor(Sprite* totem, GameMap* map) {
+bool openDoor(Sprite* totem, GameMap* layer, GameMap* map) {
 	Vector2i totemCell = WorldToCell(totem->position, cellSize);
+	int distance = totemCell.distance(layer->markPoint);
+	if (distance < 2) {
+		layer->opened = true;
+		//falta cambiar puerta por suelo
 
-	if (map->getCell(totemCell.x, totemCell.y).type == 10) {
-		std::cout << "win" << std::endl;
+		return true;
 	}
+	return false;
 }
 
 void callTotem(Sprite* totem, sPlayer* player) {
@@ -173,21 +202,28 @@ void callTotem(Sprite* totem, sPlayer* player) {
 
 bool isWin(Vector2 worldPos, GameMap* map) {
 	Vector2i playerCell = WorldToCell(worldPos, cellSize);
-
-	return playerCell == map->winPoint;
+	int distance = playerCell.distance(map->winPoint);
+	if (distance < 2) {
+		return true;
+	}
+	return false;
 };
 
-bool isValid(Vector2 worldPos, GameMap* map) { //mejorable
+bool isValid(Vector2 worldPos, GameMap* layer) { //mejorable
 	Vector2i cellCoord = WorldToCell(worldPos, cellSize);
 
 	//poliza
-	if (cellCoord.x < 0 || cellCoord.y < 0 || cellCoord.x >= map->width || cellCoord.y >= map->height)
+	if (cellCoord.x < 0 || cellCoord.y < 0 || cellCoord.x >= layer->width || cellCoord.y >= layer->height)
 	{
 
 		return false;
 	}
 	
-	return  map->getCell(cellCoord.x, cellCoord.y).type == 8 || map->getCell(cellCoord.x, cellCoord.y).type == 9;//con dos layers preguntar si es navegable o no
+	return  layer->getCell(cellCoord.x, cellCoord.y).type == FLOOR || 
+			layer->getCell(cellCoord.x, cellCoord.y).type == TOTEM ||
+			layer->getCell(cellCoord.x, cellCoord.y).type == MARK ||
+			layer->getCell(cellCoord.x, cellCoord.y).type == ENEMY ||
+		(layer->getCell(cellCoord.x, cellCoord.y).type == DOOR && layer->opened);//con dos layers preguntar si es navegable o no
 
 };
 
@@ -227,7 +263,6 @@ void sPlayer::Render( Image* framebuffer, float time, Vector2 camOffset) {
 	int start_y = (int)this->dir * this->spriteHeight;
 	Vector2 playerRender = this->position - camOffset;
 	framebuffer->drawImage(this->sprite, playerRender.x - this->spriteWidth/2 ,playerRender.y - this->spriteHeight/1.2, Area(start_x, start_y, this->spriteWidth, this->spriteHeight));
-	
 
 };
 
@@ -251,11 +286,11 @@ GameMap* GetMap(int id, std::vector<GameMap*> &maps) { return maps[id]; };
 GameMap* GetCurrentMap(int currentMap, std::vector<GameMap*> &maps) { return GetMap(currentMap, maps); };
 void SetMap(int id, int &currentMap) { currentMap = id; };
 
-void InitMaps(std::vector<GameMap*>& maps) {
+void InitMaps(std::vector<GameMap*>& maps, char* filename) {
 
 	GameMap* map;
 	TextParser tp;
-	if (tp.create("data/levels_db.txt") == false)
+	if (tp.create(filename) == false)
 		std::cout << "database file not found" << std::endl;
 
 	//while there are words to read
@@ -271,34 +306,25 @@ void InitMaps(std::vector<GameMap*>& maps) {
 }
 void World::loadWorld() {
 	//constants
-	playerToCam = Vector2(-Game::instance->framebuffer_width / 2, -Game::instance->framebuffer_height / 2);
+	playerToCam = Vector2(-Game::instance->framebuffer_width / 2, -Game::instance->framebuffer_height / 2); //cam centered on screen
 	//load sprites
 	font.loadTGA("data/bitmap-font-white.tga"); //load bitmap-font image
 	minifont.loadTGA("data/mini-font-white-4x6.tga"); //load bitmap-font image
-	player.sprite.loadTGA("data/astronaut.tga"); //example to load an sprite
 	intro.loadTGA("data/intro.tga");
-	//tutorial.loadTGA("data/tutorial.tga");
-	//end.loadTGA("data/end.tga");
-	totem.sprite.loadTGA("data/totem.tga");
+	tutorial.loadTGA("data/tutorial.tga");
+	end.loadTGA("data/end.tga");
 
-	//read file example
-		//std::string s;
-		//readFile("data/test.txt", s);
-		//std::cout << s << std::endl;
+	totem.sprite.loadTGA("data/totem.tga");
+	enemy.sprite.loadTGA("data/enemy.tga");
+	player.sprite.loadTGA("data/astronaut.tga"); //example to load an sprite
 
 	//load map/tileset/stages example
 	tileset.loadTGA("data/tileset.tga");
-	InitMaps(maps);
+	InitMaps(maps, "data/levels_db.txt");
+	InitMaps(maps_layer, "data/levels_layer_db.txt");
 	InitStages(stages);
 
-	//init position on map 0 //hardcoded
-	Vector2 playerPos = CellToWorld(maps[0]->spawnPoint, cellSize);
-	Vector2 totemPos = CellToWorld(maps[0]->totemPoint, cellSize);
-
-	player.position = playerPos;
-	player.target = playerPos;
-
-	totem.position = totemPos;
-	totem.target = totemPos;
+	//init position on map 0 
+	loadLevel(maps_layer[0], &player, &totem);
 
 }

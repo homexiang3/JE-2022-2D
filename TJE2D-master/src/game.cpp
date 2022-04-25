@@ -31,7 +31,6 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	
 
 	enableAudio(); //enable this line if you plan to add audio to your application
-	synth.osc1.amplitude = 0.5;
 
 }
 

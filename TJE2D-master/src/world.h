@@ -8,12 +8,16 @@
 
 enum eCellType : uint8 {
 	EMPTY, 
-	START,
+	FLOOR,
 	WALL,
+	START,
+	MARK,
 	DOOR,
+	ENDCELL, 
 	TOTEM,
-	WATER, 
-	FLOOR
+	DEATH,
+	TRAP,
+	ENEMY
 };
 
 enum eItemType : uint8 {
@@ -38,11 +42,14 @@ class GameMap {
 public:
 	int width;
 	int height;
-
-	Vector2i spawnPoint = Vector2i(8,8);
-	Vector2i totemPoint = Vector2i(11, 11);
-	Vector2i winPoint = Vector2i(12, 12);
+	bool opened = false;
+	Vector2i spawnPoint;
+	Vector2i markPoint;
+	Vector2i doorPoint;
+	Vector2i totemPoint;
+	Vector2i winPoint;
 	std::vector<Vector2i> enemySpawnPoints;
+	std::vector<Vector2i> trapPoints;
 
 	sCell* data;
 
@@ -68,7 +75,7 @@ public:
 
 GameMap* loadGameMap(const char* filename);
 void renderGameMap(Image& framebuffer, Image tileset, GameMap* map, Vector2 camOffset);
-void loadLevel(GameMap* map);
+
 
 
 //CAMERA
@@ -116,7 +123,7 @@ public:
 
 Vector2 EaseInOutSine(Vector2 a, Vector2 b, float t);
 void lerp(Sprite* object, float time);
-
+void loadLevel(GameMap* map, sPlayer* player, Sprite* totem);
 
 //Music class
 
@@ -140,6 +147,7 @@ public:
 	Image tutorial;
 	Image end;
 	Sprite totem;
+	Sprite enemy;
 	//Color bgcolor(130, 80, 100);
 	//added player from world.h
 	sPlayer player;
@@ -150,9 +158,10 @@ public:
 	//map functions
 	Image tileset;
 	std::vector<GameMap*> maps; //cargas fichero level_db.txt y metes todos los niveles en maps
+	std::vector<GameMap*> maps_layer;
 	//stages
 	std::vector<Stage*> stages;
-	STAGE_ID currentStage = STAGE_ID::PLAY;
+	STAGE_ID currentStage = STAGE_ID::INTRO;
 
 	void loadWorld();
 
@@ -161,7 +170,7 @@ public:
 GameMap* GetMap(int id, std::vector<GameMap*> &maps);
 GameMap* GetCurrentMap(int currentMap, std::vector<GameMap*> &maps);
 void SetMap(int id, int &currentMap);
-void InitMaps(std::vector<GameMap*> &maps);
+void InitMaps(std::vector<GameMap*> &maps, char* filename);
 
 //We assume maps always starts at (0,0)
 Vector2i WorldToCell(Vector2 worldPos, int cellsize);
@@ -171,8 +180,9 @@ Vector2 CellToWorldCenter(Vector2i cellPos, int cellsize);
 bool isValid(Vector2 worldPos, GameMap* map);
 bool isTotem(Vector2 worldPos, Vector2 totemPos);
 void totemLogic(Sprite* totem, sPlayer* player);
-void openDoor(Sprite* totem, GameMap* map);
+bool openDoor(Sprite* totem, GameMap* layer, GameMap* map);
 void callTotem(Sprite* totem, sPlayer* player);
-bool isWin(Vector2 worldPos, GameMap* map);
+bool isWin(Vector2 worldPos, GameMap* layer);
+bool isDeath(Vector2 worldPos, GameMap* layer);
 
 #endif

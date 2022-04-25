@@ -34,6 +34,7 @@ void IntroStage::Update(float seconds_elapsed) {
 	if (Input::wasKeyPressed(SDL_SCANCODE_F))
 	{
 		Game::instance->world.currentStage = TUTORIAL;
+		Game::instance->synth.playSample("data/hit.wav", 1, false);
 	}
 }
 
@@ -41,20 +42,19 @@ void IntroStage::Update(float seconds_elapsed) {
 
 void TutorialStage::Render(Image& framebuffer) {
 
-	Image minifont = Game::instance->world.minifont;
-	framebuffer.fill(Color::BLUE);
-	framebuffer.drawText("While you were travelling on the", 12, 10, minifont, 4, 6);
-	framebuffer.drawText("sushi galaxy you received a help", 12, 25, minifont, 4, 6);
-	framebuffer.drawText("message from the maki planet.", 15, 40, minifont, 4, 6);
-	framebuffer.drawText("The autoproclamated soy sauce king", 10, 60, minifont, 4, 6);
-	framebuffer.drawText("challenge you on a puzzle game.", 15, 75, minifont, 4, 6);
-	framebuffer.drawText("conquer the trials and make him quit.", 8, 90, minifont, 4, 6);
+	framebuffer.drawImage(Game::instance->world.tutorial, 0, 0);
+	if (int(Game::instance->time) % 2 == 0) {
+		framebuffer.drawText("Press F to continue", 35, 110, Game::instance->world.minifont, 4, 6);
+	}
+
 }
 
 void TutorialStage::Update(float seconds_elapsed) {
 	if (Input::wasKeyPressed(SDL_SCANCODE_F))
 	{
 		Game::instance->world.currentStage = PLAY;
+		Game::instance->synth.osc1.amplitude = 0.5;
+		Game::instance->synth.playSample("data/hit.wav", 1, false);
 	}
 }
 
@@ -62,6 +62,7 @@ void TutorialStage::Update(float seconds_elapsed) {
 
 void PlayStage::Render(Image& framebuffer) {
 	Game* game = Game::instance;
+	
 	//calculate camera
 	game->world.camOffset = computeCamera(game->world.player.position, game->world.playerToCam, game->framebuffer_width, game->framebuffer_height);
 	//render map
@@ -71,8 +72,6 @@ void PlayStage::Render(Image& framebuffer) {
 
 	//lerp?
 	lerp(&(game->world.totem), game->time);
-	//lerp(&(game->world.player), game->time);
-	//std::cout << easedT.x << " " << easedT.y << std::endl;
 
 	game->world.totem.Render(&framebuffer, game->time, game->world.camOffset);
 	//render player
@@ -107,73 +106,71 @@ void PlayStage::Update(float seconds_elapsed) {
 		movement.x -= player->moveSpeed;
 		player->dir = PLAYER_DIR::LEFT;
 	}
-	//win condition
-
-	if (isWin(player->position, GetCurrentMap(game->world.player.currentMap, game->world.maps))) {
-
-			int nextMapIndex = (player->currentMap + 1);
-			if (nextMapIndex < game->world.maps.size()) {
-				SetMap(nextMapIndex, player->currentMap);
-			}
-			else {
-				Game::instance->world.currentStage = END;
-			}
-		
-	};
-	//collisions
+	
 	Vector2 target = player->position + movement * seconds_elapsed;
+	GameMap* currentMap = GetCurrentMap(game->world.player.currentMap, game->world.maps);
+	GameMap* currentLayer = GetCurrentMap(game->world.player.currentMap, game->world.maps_layer);
 
-	if (isTotem(target, totem->position)) {
-		totemLogic(totem, player);
-		openDoor(totem, GetCurrentMap(game->world.player.currentMap, game->world.maps));
-	}
+	//win condition
+	if (isWin(player->position, currentLayer)) {
 
-	else if (isValid(target, GetCurrentMap(game->world.player.currentMap, game->world.maps))) {
-		player->target = target;	
+		int nextMapIndex = (player->currentMap + 1);
+		std::cout << nextMapIndex << std::endl;
+		if (nextMapIndex < game->world.maps.size()) {
+			SetMap(nextMapIndex, player->currentMap);
+			loadLevel(GetCurrentMap(game->world.player.currentMap, game->world.maps_layer), player, totem);
+		}
+		else {
+			Game::instance->world.currentStage = END;
+		}
+
+	};
+	//Death condition
+	if (isDeath(target, currentLayer)) {
+		Game::instance->synth.playSample("data/die.wav", 1, false);
+		player->isDead = true;
+		loadLevel(currentLayer, player, totem);
+		player->isDead = false;
 	}
-	else if (isValid(Vector2(target.x,player->position.y), GetCurrentMap(game->world.player.currentMap, game->world.maps))) {
-		player->target = Vector2(target.x, player->position.y);
-	}
-	else if (isValid(Vector2(player->position.x, target.y), GetCurrentMap(game->world.player.currentMap, game->world.maps))) {
-		player->target = Vector2(player->position.x, target.y);
-	}
-	//update movement
-	  //player->position += movement * seconds_elapsed;
+	else {
+		//collisions
+		if (isTotem(target, totem->position)) {
+			totemLogic(totem, player);
+			Game::instance->synth.playSample("data/hit.wav", 1, false);
+			if (openDoor(totem, currentLayer, currentMap)){
+				Game::instance->synth.playSample("data/win.wav", 1, false);
+			};
+		}
+
+		else if (isValid(target, GetCurrentMap(game->world.player.currentMap, game->world.maps_layer))) {
+			player->target = target;
+		}
+		else if (isValid(Vector2(target.x, player->position.y), GetCurrentMap(game->world.player.currentMap, game->world.maps_layer))) {
+			player->target = Vector2(target.x, player->position.y);
+		}
+		else if (isValid(Vector2(player->position.x, target.y), GetCurrentMap(game->world.player.currentMap, game->world.maps_layer))) {
+			player->target = Vector2(player->position.x, target.y);
+		}
+		//update movement
 		player->isMoving = player->position.x != player->target.x || player->position.y != player->target.y;
-	//oscilator
-	    Game::instance->world.music.playMelody();
 
+		//oscilator
+		Game::instance->world.music.playMelody();
 
-	//example of 'was pressed'DEBUG SOUNDS
-	if (Input::wasKeyPressed(SDL_SCANCODE_F)) //if key F was pressed example sound
-	{
-		Game::instance->synth.playSample("data/hit.wav", 1, false);
-		//debug to change maps
-		int nextMapIndex = (player->currentMap + 1) % game->world.maps.size();
-		SetMap(nextMapIndex, player->currentMap);
+		if (Input::wasKeyPressed(SDL_SCANCODE_X))
+		{
+			//attract totem to player
+			callTotem(totem, player);
+		}
 	}
-	if (Input::wasKeyPressed(SDL_SCANCODE_X))
-	{
-		//attract totem to player
-		callTotem(totem, player);
-	}
-
-	/*to read the gamepad state
-	if (Input::gamepads[0].isButtonPressed(A_BUTTON)) //if the A button is pressed
-	{
-	}
-
-	if (Input::gamepads[0].direction & PAD_UP) //left stick pointing up
-	{
-		//bgcolor.set(0, 255, 0);
-	}*/
 }
 
 //END STAGE
 
 void EndStage::Render(Image& framebuffer) {
 	Game::instance->synth.osc1.amplitude = 0;
-	framebuffer.fill(Color::PURPLE);
+	framebuffer.drawImage(Game::instance->world.end, 0, 0);
+	framebuffer.drawText("YOU WIN", 50, 10, Game::instance->world.font);
 }
 
 void EndStage::Update(float seconds_elapsed) {
