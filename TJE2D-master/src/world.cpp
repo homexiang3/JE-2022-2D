@@ -161,13 +161,15 @@ void totemLogic(Sprite* totem, sPlayer* player) {
 }
 
 bool openDoor(Sprite* totem, GameMap* layer, GameMap* map) {
-	Vector2i totemCell = WorldToCell(totem->position, cellSize);
-	int distance = totemCell.distance(layer->markPoint);
-	if (distance < 2) {
-		layer->opened = true;
-		//falta cambiar puerta por suelo
-
-		return true;
+	if (!layer->opened) {
+		Vector2i totemCell = WorldToCell(totem->position, cellSize);
+		int distance = totemCell.distance(layer->markPoint);
+		if (distance < 2) {
+			layer->opened = true;
+			//falta cambiar puerta por suelo
+			map->getCell(layer->doorPoint.x, layer->doorPoint.y).type = (eCellType)20;
+			return true;
+		}
 	}
 	return false;
 }
@@ -227,6 +229,31 @@ bool isValid(Vector2 worldPos, GameMap* layer) { //mejorable
 
 };
 
+void collisionLogic(Vector2 target, GameMap* layer,sPlayer* object) {
+
+	if (isValid(target, layer)) {
+	object->target = target;
+		}
+	else if (isValid(Vector2(target.x, object->position.y), layer)) {
+	object->target = Vector2(target.x, object->position.y);
+		}
+	else if (isValid(Vector2(object->position.x, target.y), layer)) {
+	object->target = Vector2(object->position.x, target.y);
+		}
+};
+
+void collisionLogic(Vector2 target, GameMap* layer, Sprite* object) {
+
+	if (isValid(target, layer)) {
+		object->target = target;
+	}
+	else if (isValid(Vector2(target.x, object->position.y), layer)) {
+		object->target = Vector2(target.x, object->position.y);
+	}
+	else if (isValid(Vector2(object->position.x, target.y), layer)) {
+		object->target = Vector2(object->position.x, target.y);
+	}
+};
 
 Vector2 EaseInOutSine(Vector2 a, Vector2 b, float t) {
 	float n = -(cos(PI*t) - 1.0f) / 2.0f;

@@ -184,5 +184,7 @@ bool openDoor(Sprite* totem, GameMap* layer, GameMap* map);
 void callTotem(Sprite* totem, sPlayer* player);
 bool isWin(Vector2 worldPos, GameMap* layer);
 bool isDeath(Vector2 worldPos, GameMap* layer);
+void collisionLogic(Vector2 target, GameMap* layer, sPlayer* object);
+void collisionLogic(Vector2 target, GameMap* layer, Sprite* object);
 
 #endif

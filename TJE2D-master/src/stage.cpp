@@ -128,9 +128,9 @@ void PlayStage::Update(float seconds_elapsed) {
 	//Death condition
 	if (isDeath(target, currentLayer)) {
 		Game::instance->synth.playSample("data/die.wav", 1, false);
-		player->isDead = true;
+		currentMap->getCell(currentLayer->doorPoint.x, currentLayer->doorPoint.y).type = (eCellType)11;
 		loadLevel(currentLayer, player, totem);
-		player->isDead = false;
+
 	}
 	else {
 		//collisions
@@ -141,16 +141,9 @@ void PlayStage::Update(float seconds_elapsed) {
 				Game::instance->synth.playSample("data/win.wav", 1, false);
 			};
 		}
-
-		else if (isValid(target, GetCurrentMap(game->world.player.currentMap, game->world.maps_layer))) {
-			player->target = target;
-		}
-		else if (isValid(Vector2(target.x, player->position.y), GetCurrentMap(game->world.player.currentMap, game->world.maps_layer))) {
-			player->target = Vector2(target.x, player->position.y);
-		}
-		else if (isValid(Vector2(player->position.x, target.y), GetCurrentMap(game->world.player.currentMap, game->world.maps_layer))) {
-			player->target = Vector2(player->position.x, target.y);
-		}
+		else {
+			collisionLogic(target, currentLayer, player);
+		};
 		//update movement
 		player->isMoving = player->position.x != player->target.x || player->position.y != player->target.y;
 
@@ -176,6 +169,14 @@ void EndStage::Render(Image& framebuffer) {
 void EndStage::Update(float seconds_elapsed) {
 	if (Input::wasKeyPressed(SDL_SCANCODE_F))
 	{
-		Game::instance->must_exit = true;
+		Game* game = Game::instance;
+		GameMap* currentLayer = GetCurrentMap(game->world.player.currentMap, game->world.maps_layer);
+		sPlayer* player = &(game->world.player);
+		Sprite* totem = &(game->world.totem);
+
+		SetMap(0, player->currentMap);
+		loadLevel(GetCurrentMap(game->world.player.currentMap, game->world.maps_layer), player, totem);
+		Game::instance->world.currentStage = PLAY;
+		Game::instance->synth.osc1.amplitude = 0.5;
 	}
 }
